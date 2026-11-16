@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import dataclasses
 import signal
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -49,6 +50,9 @@ class SandboxResult:
     #: The exact command line used to launch the sandbox, for reproduction.
     sandbox_command: tuple[str, ...]
     rlimits: dict[str, str]
+    #: True when ``signal`` was derived from a 128+N exit code rather than
+    #: observed directly.  See :func:`decode_signal_exit`.
+    signal_inferred: bool = False
 
     @property
     def signal_name(self) -> str | None:
@@ -72,7 +76,40 @@ class SandboxResult:
             "backend": self.backend,
             "sandbox_command": list(self.sandbox_command),
             "rlimits": dict(self.rlimits),
+            "signal_inferred": self.signal_inferred,
         }
+
+
+#: Exit code a shell-style wrapper reports for a child killed by signal N.
+SIGNAL_EXIT_BASE = 128
+
+#: Highest real-time signal number on Linux.
+MAX_SIGNAL = 64
+
+
+def decode_signal_exit(result: SandboxResult) -> SandboxResult:
+    """Recover a signal number that the sandbox helper folded into an exit code.
+
+    bubblewrap waits for the containerised process itself and then exits with
+    ``128 + signum`` when that process died from a signal — the shell
+    convention.  ``--json-status-fd`` reports the same collapsed number, so the
+    raw wait status is simply not available to us.
+
+    Rather than lose the distinction between "exited with code 134" and "killed
+    by SIGABRT", the number is decoded back into a signal and marked as
+    inferred.  The ambiguity is real but bounded: a target that deliberately
+    exits with a code in this range is indistinguishable from one that was
+    killed, which is why every consumer sees ``signal_inferred`` alongside the
+    value and corroborates it against the captured stderr.
+    """
+    if result.signal is not None or result.exit_code is None:
+        return result
+    code = result.exit_code
+    if SIGNAL_EXIT_BASE < code <= SIGNAL_EXIT_BASE + MAX_SIGNAL:
+        return dataclasses.replace(
+            result, signal=code - SIGNAL_EXIT_BASE, signal_inferred=True
+        )
+    return result
 
 
 @dataclass(frozen=True)
@@ -107,3 +144,6 @@ class SandboxBackend(Protocol):
 
     def run(self, request: SandboxRequest) -> SandboxResult:
         """Execute ``request`` and return what was observed."""
+
+    def sandbox_path(self, host_workdir: Path) -> str:
+        """Path at which ``host_workdir`` appears to the sandboxed process."""

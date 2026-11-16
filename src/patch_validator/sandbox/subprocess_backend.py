@@ -45,6 +45,10 @@ class SubprocessSandboxBackend:
             ),
         )
 
+    def sandbox_path(self, host_workdir: Path) -> str:
+        """Without a mount namespace the host path is the only path."""
+        return str(host_workdir)
+
     def run(self, request: SandboxRequest) -> SandboxResult:
         log.warning(
             "executing %s WITHOUT isolation (subprocess backend)",

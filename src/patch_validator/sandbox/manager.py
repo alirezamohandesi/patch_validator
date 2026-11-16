@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import dataclasses
 import logging
+from pathlib import Path
 
 from ..config import SandboxSpec
 from ..errors import SandboxUnavailable
@@ -70,6 +71,10 @@ class SandboxManager:
                 "labelled sandbox_backend='subprocess' in the report"
             )
         return report
+
+    def sandbox_path(self, host_workdir: Path) -> str:
+        """Path at which ``host_workdir`` appears inside the sandbox."""
+        return self.backend.sandbox_path(host_workdir)
 
     def run(self, request: SandboxRequest) -> SandboxResult:
         """Execute one request under the selected backend."""

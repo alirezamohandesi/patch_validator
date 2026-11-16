@@ -14,7 +14,7 @@ import os
 import shutil
 from pathlib import Path
 
-from .base import ProbeReport, SandboxRequest, SandboxResult
+from .base import ProbeReport, SandboxRequest, SandboxResult, decode_signal_exit
 from .runner import execute
 
 log = logging.getLogger(__name__)
@@ -145,10 +145,13 @@ class BubblewrapSandboxBackend:
         for path in _SYSTEM_FILES:
             args += ["--ro-bind-try", path, path]
 
+        args += ["--proc", "/proc", "--dev", "/dev", "--tmpfs", "/tmp"]
+
+        # Caller-supplied binds come after the tmpfs so that a path underneath
+        # /tmp — which is where the build workspace normally lives — is not
+        # hidden by it.  bwrap applies operations in order.
         for path in ro_binds:
             args += ["--ro-bind-try", str(path), str(path)]
-
-        args += ["--proc", "/proc", "--dev", "/dev", "--tmpfs", "/tmp"]
 
         if workdir is not None:
             args += ["--bind", str(workdir), SANDBOX_WORKDIR, "--chdir", SANDBOX_WORKDIR]
@@ -185,13 +188,20 @@ class BubblewrapSandboxBackend:
             return []
         return [prlimit, f"--nproc={request.max_processes}", "--"]
 
+    def sandbox_path(self, host_workdir: Path) -> str:
+        """The working directory is always mounted at a fixed path."""
+        del host_workdir
+        return SANDBOX_WORKDIR
+
     # -- execution ---------------------------------------------------------
 
     def run(self, request: SandboxRequest) -> SandboxResult:
         command = self.build_command(request)
         # The environment is installed inside the sandbox with --setenv after
         # --clearenv, so the bwrap process itself needs nothing.
-        return execute(command, request, backend=self.name, env={}, nproc=None)
+        result = execute(command, request, backend=self.name, env={}, nproc=None)
+        # bwrap collapses "killed by signal N" into exit code 128+N; recover it.
+        return decode_signal_exit(result)
 
 
 def _probe_user_namespaces() -> str:
