@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "patch-validator"
+version = "0.1.0"
+description = "Automated security patch validation and regression testing for CI/CD"
+requires-python = ">=3.11"
+dependencies = [
+    "PyYAML>=6.0",
+    "jsonschema>=4.17",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+]
+
+[project.scripts]
+patch-validator = "patch_validator.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+patch_validator = ["report/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "sandbox: requires a working sandbox backend",
+    "toolchain: requires a C compiler and cmake",
+    "slow: end-to-end run over the full matrix",
+]
