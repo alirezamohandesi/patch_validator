@@ -320,3 +320,54 @@ class TestFailedRunReporting:
             if item.name == "executions_isolated"
         )
         assert check.detail == "no execution took place"
+
+
+class TestGeneratedRegressionSuite:
+    """A generated suite must gate later runs, and say when it is stale."""
+
+    @staticmethod
+    @pytest.fixture(scope="class")
+    def suite(tmp_path_factory) -> Path:
+        run_dir = tmp_path_factory.mktemp("gen")
+        assert run_validate(run_dir, "correct-patch") == exit_codes.PASS
+        path = run_dir / "regression" / "suite.json"
+        assert path.is_file()
+        return path
+
+    def _replay(self, suite: Path, revision: str, run_dir: Path) -> int:
+        return main(
+            [
+                "-q", "regression",
+                "--config", str(CONFIG),
+                "--patched-revision", revision,
+                "--suite", str(suite),
+                "--run-dir", str(run_dir),
+            ]
+        )
+
+    def test_the_suite_passes_against_the_patch_it_came_from(self, suite, tmp_path):
+        assert self._replay(suite, "correct-patch", tmp_path / "a") == exit_codes.PASS
+
+    def test_the_suite_catches_a_patch_that_leaves_a_path_unfixed(self, suite, tmp_path):
+        # The RAW reproducer still faults under the incomplete patch, and the
+        # generated test is what notices.
+        assert (
+            self._replay(suite, "incomplete-patch", tmp_path / "b")
+            == exit_codes.VULN_REMAINS
+        )
+
+    def test_a_suite_whose_base_no_longer_faults_is_reported_stale(self, suite, tmp_path):
+        # Using the correct patch as the *base* means the fault these tests
+        # guard against is already gone, so they guard nothing. Passing
+        # silently would be misleading.
+        code = main(
+            [
+                "-q", "regression",
+                "--config", str(CONFIG),
+                "--base-revision", "correct-patch",
+                "--patched-revision", "base",
+                "--suite", str(suite),
+                "--run-dir", str(tmp_path / "c"),
+            ]
+        )
+        assert code == exit_codes.INCONCLUSIVE

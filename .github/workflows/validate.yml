@@ -166,6 +166,23 @@ jobs:
             cat "runs/${{ matrix.revision }}/report.md"
           } >> "$GITHUB_STEP_SUMMARY"
 
+      # 10b. Re-run the regression tests this run generated, proving a
+      #      generated suite can gate a later run rather than only existing.
+      - name: Re-run the generated regression suite
+        if: always()
+        continue-on-error: true
+        run: |
+          suite="runs/${{ matrix.revision }}/regression/suite.json"
+          if [ -f "$suite" ]; then
+            patch-validator regression \
+              --config configs/recparse.yaml \
+              --patched-revision "${{ matrix.revision }}" \
+              --suite "$suite" \
+              --run-dir "runs/${{ matrix.revision }}-regression"
+          else
+            echo "no regression suite was generated for this revision"
+          fi
+
       # 13. Artifact upload — always, so a failing run is still diagnosable.
       - name: Upload the run directory
         if: always()
