@@ -1,6 +1,15 @@
-# recparse — validating the CORRECT patch.
+# recparse — the toy target.
 #
-# Expected outcome: exit code 0 (PASS).
+# The patched revision below is the default; override it to validate any other
+# candidate fix against the same base, the same tests and the same oracles:
+#
+#   patch-validator validate --config configs/recparse.yaml \
+#       --patched-revision incomplete-patch
+#
+# Expected outcomes for the four scenarios shipped with this target:
+#   correct-patch      exit 0   (PASS)
+#   incomplete-patch   exit 10  (VULN_REMAINS)
+#   regression-patch   exit 20  (FUNC_REGRESSION)
 #
 # The oracle entries below are the executable form of
 # targets/recparse/SPECIFICATION.md section 8.  They were written from that

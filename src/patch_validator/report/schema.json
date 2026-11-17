@@ -1,0 +1,277 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/patch-validator/report-1.0.json",
+  "title": "patch-validator run report",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "tool",
+    "run",
+    "environment",
+    "sandbox",
+    "target",
+    "revisions",
+    "patch",
+    "builds",
+    "test_configuration",
+    "executions",
+    "crash_evidence",
+    "findings",
+    "patch_correlations",
+    "classification",
+    "exit_code"
+  ],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "tool": {
+      "type": "object",
+      "required": ["name", "version"],
+      "properties": {
+        "name": {"type": "string"},
+        "version": {"type": "string"}
+      }
+    },
+    "run": {
+      "type": "object",
+      "required": ["id", "started_at", "config_path"],
+      "properties": {
+        "id": {"type": "string"},
+        "started_at": {"type": "string"},
+        "finished_at": {"type": "string"},
+        "duration_s": {"type": "number"},
+        "config_path": {"type": "string"},
+        "command": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "environment": {"type": "object"},
+    "sandbox": {
+      "type": "object",
+      "required": ["backend", "isolated"],
+      "properties": {
+        "backend": {"type": "string"},
+        "isolated": {"type": "boolean"},
+        "probe": {"type": "object"}
+      }
+    },
+    "target": {
+      "type": "object",
+      "required": ["name", "repo_path"],
+      "properties": {
+        "name": {"type": "string"},
+        "description": {"type": "string"},
+        "language": {"type": "string"},
+        "repo_path": {"type": "string"},
+        "source_subdir": {"type": "string"}
+      }
+    },
+    "revisions": {
+      "type": "object",
+      "required": ["base", "patched"],
+      "additionalProperties": {
+        "type": "object",
+        "required": ["revision", "commit"],
+        "properties": {
+          "revision": {"type": "string"},
+          "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+          "subject": {"type": "string"},
+          "author": {"type": "string"},
+          "authored_at": {"type": "string"}
+        }
+      }
+    },
+    "patch": {"type": "object"},
+    "builds": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["version", "build_mode", "status", "compiler", "cflags"],
+        "properties": {
+          "version": {"enum": ["base", "patched"]},
+          "build_mode": {"enum": ["release", "sanitized"]},
+          "status": {"enum": ["success", "failed"]},
+          "binary_sha256": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "test_configuration": {"type": "object"},
+    "executions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "test_id",
+          "version",
+          "build_mode",
+          "exit_code",
+          "signal",
+          "input_sha256",
+          "binary_sha256",
+          "sandbox_backend"
+        ],
+        "properties": {
+          "version": {"enum": ["base", "patched"]},
+          "build_mode": {"enum": ["release", "sanitized"]},
+          "exit_code": {"type": ["integer", "null"]},
+          "signal": {"type": ["integer", "null"]},
+          "timed_out": {"type": "boolean"}
+        }
+      }
+    },
+    "crash_evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "test_id",
+          "version",
+          "build_mode",
+          "outcome",
+          "error_type",
+          "detection_mechanism",
+          "confidence"
+        ],
+        "properties": {
+          "outcome": {
+            "enum": [
+              "clean",
+              "security_event",
+              "crash_unclassified",
+              "timeout",
+              "resource_limit",
+              "launch_failure"
+            ]
+          },
+          "detection_mechanism": {
+            "enum": [
+              "address_sanitizer",
+              "undefined_behavior_sanitizer",
+              "leak_sanitizer",
+              "stack_protector",
+              "fortify_source",
+              "glibc_malloc_check",
+              "os_signal",
+              "runtime_diagnostic",
+              "resource_limit",
+              "none"
+            ]
+          },
+          "confidence": {"enum": ["high", "medium", "low"]},
+          "signature_quality": {"enum": ["symbolized", "unsymbolized", "none"]}
+        }
+      }
+    },
+    "oracle_verdicts": {"type": "array"},
+    "findings": {
+      "type": "object",
+      "required": ["security", "functional", "completeness"],
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["id", "axis", "kind", "test_id", "build_mode", "summary"],
+          "properties": {
+            "axis": {"enum": ["security", "functional", "completeness"]},
+            "kind": {
+              "enum": [
+                "FIXED",
+                "INCOMPLETE_FIX",
+                "NEW_ISSUE",
+                "FUNCTIONAL_REGRESSION",
+                "FUNCTIONAL_FIX",
+                "PRE_EXISTING_DEFECT",
+                "INCONCLUSIVE",
+                "MISSING_ORACLE",
+                "RESOURCE_LIMIT",
+                "ANALYSIS_GAP"
+              ]
+            },
+            "confidence": {"enum": ["high", "medium", "low"]},
+            "evidence_refs": {"type": "array", "items": {"type": "string"}}
+          }
+        }
+      }
+    },
+    "patch_correlations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["finding_id", "correlation_status", "confidence"],
+        "properties": {
+          "correlation_status": {
+            "enum": ["CONFIRMED", "LIKELY", "WEAK", "UNKNOWN"]
+          },
+          "confidence": {"enum": ["high", "medium", "low", "none"]}
+        }
+      }
+    },
+    "reproductions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["finding_id", "stability", "replays"],
+        "properties": {
+          "stability": {"enum": ["stable", "flaky", "not_reproduced"]},
+          "replay_count": {"type": "integer", "minimum": 3}
+        }
+      }
+    },
+    "minimizations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "finding_id",
+          "original_size",
+          "minimized_size",
+          "reduction_percent"
+        ]
+      }
+    },
+    "regression_tests": {"type": "array"},
+    "hardening": {
+      "type": ["object", "null"],
+      "properties": {
+        "protections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["protection", "base", "patched", "change_status"],
+            "properties": {
+              "change_status": {
+                "enum": ["unchanged", "weakened", "strengthened", "unknown"]
+              }
+            }
+          }
+        },
+        "limitations": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "build_mode_comparison": {"type": "array"},
+    "classification": {
+      "type": "object",
+      "required": [
+        "security_status",
+        "functional_status",
+        "completeness_status",
+        "final_classification",
+        "exit_code",
+        "mandatory_checks"
+      ],
+      "properties": {
+        "security_status": {"enum": ["CLEAN", "VULNERABLE", "UNKNOWN"]},
+        "functional_status": {"enum": ["PASS", "REGRESSION", "UNKNOWN"]},
+        "completeness_status": {"enum": ["COMPLETE", "INCOMPLETE"]},
+        "exit_code": {"enum": [0, 10, 20, 30, 40]},
+        "mandatory_checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "passed", "detail"]
+          }
+        }
+      }
+    },
+    "exit_code": {"enum": [0, 10, 20, 30, 40]},
+    "notes": {"type": "array", "items": {"type": "string"}}
+  }
+}

@@ -1,0 +1,533 @@
+"""Command-line interface — module 17 of the architecture.
+
+The process exit code is the product here.  Printing a verdict into the JSON
+report is not enough: a pipeline decides what to do next from ``$?``, so every
+path through this module ends in an exit code drawn from
+:mod:`patch_validator.classify.exit_codes` (R-EXIT-08).
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import logging
+import sys
+from pathlib import Path
+
+from . import __version__
+from .analysis.crash import CrashAnalyzer
+from .analysis.hardening import HardeningAnalyzer
+from .artifacts import ArtifactStore, new_run_id
+from .build import BuildManager
+from .classify import exit_codes
+from .config import load_config
+from .errors import PatchValidatorError
+from .execution import ExecutionEngine
+from .logging_setup import setup_logging
+from .pipeline import Pipeline
+from .reproducer import load_manifest
+from .sandbox import SandboxManager
+from .util import environment
+from .util.hashing import sha256_file
+from .vcs import GitRepo
+
+log = logging.getLogger(__name__)
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog="patch-validator",
+        description=(
+            "Validate a security patch by running the program before and after "
+            "it, and report whether the fault is gone, whether a new one "
+            "appeared, and whether behaviour regressed."
+        ),
+        epilog=(
+            "exit codes: "
+            + ", ".join(f"{code}={exit_codes.name(code)}" for code in (0, 10, 20, 30, 40))
+            + ". Precedence when several apply: "
+            + " > ".join(str(code) for code in exit_codes.EXIT_PRECEDENCE)
+            + "."
+        ),
+    )
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="count",
+        default=0,
+        help="increase log verbosity (repeatable)",
+    )
+    parser.add_argument(
+        "-q", "--quiet", action="store_true", help="only log warnings and errors"
+    )
+
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    def with_config(sub: argparse.ArgumentParser) -> argparse.ArgumentParser:
+        sub.add_argument(
+            "--config", type=Path, required=True, help="target configuration file (YAML)"
+        )
+        # Overriding the revisions is what lets one configuration validate a
+        # patch the configuration has never seen: same base, same test suite,
+        # same oracles, a different candidate fix.
+        sub.add_argument(
+            "--base-revision",
+            default=None,
+            help="override target.base_revision from the configuration",
+        )
+        sub.add_argument(
+            "--patched-revision",
+            default=None,
+            help=(
+                "override target.patched_revision; use this to validate a "
+                "patch the configuration does not mention"
+            ),
+        )
+        return sub
+
+    def with_run_dir(sub: argparse.ArgumentParser) -> argparse.ArgumentParser:
+        sub.add_argument(
+            "--run-dir",
+            type=Path,
+            default=None,
+            help="where to write artifacts (default: runs/<run-id>)",
+        )
+        sub.add_argument(
+            "--keep-workspace",
+            action="store_true",
+            help="keep the build workspace for inspection",
+        )
+        return sub
+
+    validate = with_run_dir(
+        with_config(
+            subparsers.add_parser(
+                "validate", help="run the complete validation and produce the verdict"
+            )
+        )
+    )
+    validate.add_argument(
+        "--no-minimize",
+        action="store_true",
+        help="skip input minimization (faster; bundles keep the original input)",
+    )
+
+    with_config(
+        subparsers.add_parser("check-config", help="validate a configuration file")
+    )
+    with_run_dir(
+        with_config(subparsers.add_parser("build", help="build all four binaries"))
+    )
+    with_run_dir(
+        with_config(
+            subparsers.add_parser(
+                "test", help="build and execute the matrix without analysis"
+            )
+        )
+    )
+    with_run_dir(
+        with_config(
+            subparsers.add_parser(
+                "hardening", help="compare binary protections between the builds"
+            )
+        )
+    )
+
+    report = subparsers.add_parser(
+        "report", help="re-render the summary of a previous run"
+    )
+    report.add_argument("--run", type=Path, required=True, help="run directory")
+    report.add_argument(
+        "--format",
+        choices=("markdown", "json", "summary"),
+        default="summary",
+        help="what to print",
+    )
+
+    reproduce = subparsers.add_parser("reproduce", help="replay a reproducer bundle")
+    reproduce.add_argument("bundle", type=Path, help="path to a bundle directory")
+
+    subparsers.add_parser(
+        "doctor", help="check that this environment can run the validator"
+    )
+
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    setup_logging(-1 if args.quiet else args.verbose)
+
+    handlers = {
+        "validate": _cmd_validate,
+        "check-config": _cmd_check_config,
+        "build": _cmd_build,
+        "test": _cmd_test,
+        "hardening": _cmd_hardening,
+        "report": _cmd_report,
+        "reproduce": _cmd_reproduce,
+        "doctor": _cmd_doctor,
+    }
+
+    try:
+        return handlers[args.command](args)
+    except PatchValidatorError as exc:
+        log.error("%s", exc)
+        if exc.remedy:
+            log.error("hint: %s", exc.remedy)
+        return exc.exit_code
+    except KeyboardInterrupt:  # pragma: no cover - interactive
+        log.error("interrupted")
+        return exit_codes.INCONCLUSIVE
+
+
+# -- commands --------------------------------------------------------------
+
+
+def _cmd_validate(args: argparse.Namespace) -> int:
+    config = _load(args)
+    if args.no_minimize:
+        config = _without_minimization(config)
+
+    run_id = new_run_id()
+    artifacts = ArtifactStore(args.run_dir or Path("runs") / run_id)
+    pipeline = Pipeline(
+        config,
+        artifacts=artifacts,
+        command=["patch-validator", *sys.argv[1:]],
+        run_id=run_id,
+        keep_workspace=args.keep_workspace,
+    )
+
+    record = pipeline.run()
+    json_ref, markdown_ref = pipeline.write_reports()
+
+    classification = record.classification
+    assert classification is not None
+    _print_verdict(record, artifacts, json_ref, markdown_ref)
+    return classification.exit_code
+
+
+def _cmd_check_config(args: argparse.Namespace) -> int:
+    config = _load(args)
+    print(f"configuration is valid: {args.config}")
+    print(f"  target          {config.target.name}")
+    print(f"  repository      {config.target.repo_path}")
+    print(
+        f"  revisions       {config.target.base_revision} -> "
+        f"{config.target.patched_revision}"
+    )
+    print(f"  build modes     {', '.join(config.modes)}")
+    print(f"  input method    {config.input.method}")
+    print(f"  test cases      {len(config.tests)}")
+    with_oracle = sum(1 for case in config.tests if case.oracle is not None)
+    print(f"  with an oracle  {with_oracle}")
+    print(f"  sandbox         {config.sandbox.backend}")
+
+    repo = GitRepo(config.target.repo_path)
+    for name, revision in (
+        ("base", config.target.base_revision),
+        ("patched", config.target.patched_revision),
+    ):
+        info = repo.describe(revision)
+        print(f"  {name:<15} {info.commit[:12]}  {info.subject[:60]}")
+    return exit_codes.PASS
+
+
+def _cmd_build(args: argparse.Namespace) -> int:
+    config = _load(args)
+    artifacts = ArtifactStore(args.run_dir or Path("runs") / new_run_id())
+    workspace = artifacts.subdir("workspace")
+    builder = BuildManager(config, GitRepo(config.target.repo_path), workspace, artifacts)
+    builder.prepare_sources()
+    records = builder.build_all()
+    for record in records.values():
+        print(
+            f"{record.version:<8}{record.mode:<11}{record.binary_path}  "
+            f"{(record.binary_sha256 or '')[:16]}"
+        )
+    if not args.keep_workspace:
+        builder.cleanup()
+    return exit_codes.PASS
+
+
+def _cmd_test(args: argparse.Namespace) -> int:
+    config = _load(args)
+    artifacts = ArtifactStore(args.run_dir or Path("runs") / new_run_id())
+    workspace = artifacts.subdir("workspace")
+    sandbox = SandboxManager(config.sandbox)
+    sandbox.ensure_available()
+
+    builder = BuildManager(config, GitRepo(config.target.repo_path), workspace, artifacts)
+    builder.prepare_sources()
+    builds = builder.build_all()
+    analyzer = CrashAnalyzer(
+        source_roots=(builder.source_path("base"), builder.source_path("patched"))
+    )
+    engine = ExecutionEngine(config, sandbox, workspace, artifacts)
+
+    header = f"{'test':<28}" + "".join(
+        f"{version[:4] + '/' + mode[:3]:<24}"
+        for version in ("base", "patched")
+        for mode in config.modes
+    )
+    print(header)
+    print("-" * len(header))
+    for case in config.tests:
+        row = f"{case.id:<28}"
+        for version in ("base", "patched"):
+            for mode in config.modes:
+                crash = analyzer.analyze(engine.run_case(case, builds[(version, mode)]))
+                row += f"{_outcome_cell(crash):<24}"
+        print(row)
+
+    if not args.keep_workspace:
+        builder.cleanup()
+    return exit_codes.PASS
+
+
+def _cmd_hardening(args: argparse.Namespace) -> int:
+    config = _load(args)
+    artifacts = ArtifactStore(args.run_dir or Path("runs") / new_run_id())
+    workspace = artifacts.subdir("workspace")
+    builder = BuildManager(config, GitRepo(config.target.repo_path), workspace, artifacts)
+    builder.prepare_sources()
+    base = builder.build("base", "release")
+    patched = builder.build("patched", "release")
+
+    report = HardeningAnalyzer().compare(base.binary(), patched.binary())
+    artifacts.write_json("hardening/report.json", report.to_dict())
+
+    print(f"{'protection':<16}{'base':<12}{'patched':<12}{'change':<14}evidence")
+    for comparison in report.comparisons:
+        print(
+            f"{comparison.name:<16}{comparison.base:<12}{comparison.patched:<12}"
+            f"{comparison.change_status:<14}{comparison.patched_evidence}"
+        )
+    for warning in report.warnings:
+        print(f"\nWARNING: {warning}")
+    print("\nlimitations:")
+    for limitation in report.limitations:
+        print(f"  - {limitation}")
+
+    if not args.keep_workspace:
+        builder.cleanup()
+    return exit_codes.VULN_REMAINS if report.weakened else exit_codes.PASS
+
+
+def _cmd_report(args: argparse.Namespace) -> int:
+    run_dir: Path = args.run
+    report_path = run_dir / "report.json"
+    if not report_path.is_file():
+        log.error("no report.json in %s", run_dir)
+        return exit_codes.BUILD_OR_CONFIG_ERROR
+
+    payload = json.loads(report_path.read_text(encoding="utf-8"))
+    if args.format == "json":
+        print(json.dumps(payload, indent=2, ensure_ascii=False))
+    elif args.format == "markdown":
+        markdown = run_dir / "report.md"
+        print(markdown.read_text(encoding="utf-8") if markdown.is_file() else "")
+    else:
+        classification = payload["classification"]
+        print(
+            f"{classification['final_classification']} "
+            f"(exit {classification['exit_code']})"
+        )
+        print(f"  security      {classification['security_status']}")
+        print(f"  functional    {classification['functional_status']}")
+        print(f"  completeness  {classification['completeness_status']}")
+        for reason in classification["rationale"]:
+            print(f"  - {reason}")
+    return int(payload["exit_code"])
+
+
+def _cmd_reproduce(args: argparse.Namespace) -> int:
+    bundle: Path = args.bundle
+    try:
+        manifest = load_manifest(bundle)
+    except (FileNotFoundError, json.JSONDecodeError) as exc:
+        log.error("cannot read bundle: %s", exc)
+        return exit_codes.BUILD_OR_CONFIG_ERROR
+
+    build = manifest["build"]
+    binary = Path(build["binary_path"] or "")
+    print(f"bundle          {bundle}")
+    print(f"finding         {manifest['finding_id']}")
+    print(
+        f"recorded fault  {manifest['crash']['error_type']} at "
+        f"{manifest['crash']['location'] or 'unknown'}"
+    )
+    print(f"commit          {manifest['commit']}")
+    print(f"binary          {binary}")
+
+    if not binary.is_file():
+        log.error("the recorded binary no longer exists")
+        log.error(
+            "rebuild it from commit %s with: %s",
+            manifest["commit"][:12],
+            " && ".join(" ".join(command) for command in build["commands"]),
+        )
+        return exit_codes.BUILD_OR_CONFIG_ERROR
+
+    actual = sha256_file(binary)
+    if actual != build["binary_sha256"]:
+        log.error(
+            "binary hash mismatch: recorded %s, found %s",
+            (build["binary_sha256"] or "")[:16],
+            actual[:16],
+        )
+        log.error("the replay would not be comparable to the recorded run")
+        return exit_codes.BUILD_OR_CONFIG_ERROR
+
+    print(f"binary sha256   matches ({actual[:16]})")
+    print()
+    print("recorded replays:")
+    for replay in manifest["replays"]:
+        mark = "reproduced" if replay["matched_expected"] else "DID NOT reproduce"
+        print(
+            f"  #{replay['index']}  {mark:<18} exit={replay['exit_code']} "
+            f"signal={replay['signal_name']} {replay['error_type']}"
+        )
+    print()
+    print(f"stability       {manifest['stability']}")
+    print(f"instructions    {bundle / 'REPRODUCE.md'}")
+
+    if manifest["stability"] == "stable":
+        return exit_codes.PASS
+    return exit_codes.INCONCLUSIVE
+
+
+def _cmd_doctor(_: argparse.Namespace) -> int:
+    from .config.models import SandboxSpec
+
+    print(f"patch-validator {__version__}")
+    print()
+
+    captured = environment.capture()
+    print("environment")
+    print(f"  platform        {captured['platform']}")
+    print(f"  kernel          {captured['kernel']}")
+    print(f"  python          {captured['python']}")
+    print(f"  cpus            {captured['cpu_count']}")
+    container = captured["container"]
+    print(
+        f"  container       {container.get('runtime', 'none')} "
+        f"({'detected' if container['detected'] == 'true' else 'not detected'})"
+    )
+    if captured["image_digest"]:
+        print(f"  image digest    {captured['image_digest']}")
+
+    print()
+    print("tools")
+    missing = [
+        name for name, version in captured["tools"].items() if version == "not found"
+    ]
+    for name, version in captured["tools"].items():
+        print(f"  {name:<15} {version}")
+
+    print()
+    print("sandbox")
+    manager = SandboxManager(SandboxSpec(backend="bubblewrap"))
+    probe = manager.probe()
+    for check, outcome in probe.checks.items():
+        print(f"  {check:<22} {outcome}")
+    print(f"  {'available':<22} {probe.available}")
+
+    if not probe.available:
+        print()
+        print(f"REASON: {probe.reason}")
+        print(f"REMEDY: {probe.remedy}")
+        print()
+        print(
+            "The validator will not execute a known-vulnerable binary without "
+            "isolation. Fix the above, or acknowledge the risk explicitly with "
+            "sandbox.backend: subprocess and sandbox.unsafe_ack: true."
+        )
+        return exit_codes.BUILD_OR_CONFIG_ERROR
+
+    if missing:
+        print()
+        print(f"missing tools: {', '.join(missing)}")
+        return exit_codes.BUILD_OR_CONFIG_ERROR
+
+    print()
+    print("this environment can run the validator")
+    return exit_codes.PASS
+
+
+# -- helpers ---------------------------------------------------------------
+
+
+def _print_verdict(record, artifacts: ArtifactStore, json_ref: str, markdown_ref: str) -> None:
+    classification = record.classification
+    counts = classification.counts
+
+    print()
+    print("=" * 72)
+    print(f"  {classification.final_classification}  (exit code {classification.exit_code})")
+    print("=" * 72)
+    print(f"  security axis       {classification.security_status}")
+    print(f"  functional axis     {classification.functional_status}")
+    print(f"  analysis complete   {classification.completeness_status}")
+    print()
+    print(
+        f"  {counts['fixed']} fixed · "
+        f"{counts['security_confirmed']} confirmed security finding(s) · "
+        f"{counts['functional_regressions']} functional regression(s) · "
+        f"{counts['completeness_gaps']} gap(s)"
+    )
+    if classification.rationale:
+        print()
+        for reason in classification.rationale[:8]:
+            print(f"  - {reason}")
+    print()
+    print(f"  report   {artifacts.root / json_ref}")
+    print(f"  summary  {artifacts.root / markdown_ref}")
+    print()
+
+
+def _load(args: argparse.Namespace):
+    """Load the configuration, applying any revision overrides."""
+    import dataclasses
+
+    config = load_config(args.config)
+    base = getattr(args, "base_revision", None)
+    patched = getattr(args, "patched_revision", None)
+    if base is None and patched is None:
+        return config
+
+    target = dataclasses.replace(
+        config.target,
+        base_revision=base or config.target.base_revision,
+        patched_revision=patched or config.target.patched_revision,
+    )
+    log.info(
+        "revision override: %s -> %s",
+        target.base_revision,
+        target.patched_revision,
+    )
+    return dataclasses.replace(config, target=target)
+
+
+def _outcome_cell(crash) -> str:
+    if crash.outcome == "clean":
+        return f"exit {crash.exit_code}"
+    if crash.outcome in ("security_event", "crash_unclassified"):
+        return crash.error_type[:22]
+    return crash.outcome
+
+
+def _without_minimization(config):
+    import dataclasses
+
+    return dataclasses.replace(
+        config,
+        minimization=dataclasses.replace(config.minimization, enabled=False),
+    )
+
+
+if __name__ == "__main__":  # pragma: no cover
+    sys.exit(main())
