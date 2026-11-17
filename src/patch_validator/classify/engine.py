@@ -317,16 +317,23 @@ def _mandatory_checks(facts: RunFacts) -> list[MandatoryCheck]:
         )
     )
 
+    if facts.completed_executions == 0:
+        # Saying executions were unisolated when none happened would point at
+        # the wrong problem; the build or the sandbox check above is the real
+        # failure, and this check should not add noise to it.
+        isolation_detail = "no execution took place"
+    elif facts.sandbox_isolated:
+        isolation_detail = f"all executions ran under the '{facts.sandbox_backend}' sandbox"
+    else:
+        isolation_detail = (
+            f"executions ran under '{facts.sandbox_backend}', which provides "
+            "no isolation"
+        )
     checks.append(
         MandatoryCheck(
             name="executions_isolated",
-            passed=facts.sandbox_isolated,
-            detail=(
-                f"all executions ran under the '{facts.sandbox_backend}' sandbox"
-                if facts.sandbox_isolated
-                else f"executions ran under '{facts.sandbox_backend}', which "
-                "provides no isolation"
-            ),
+            passed=facts.sandbox_isolated or facts.completed_executions == 0,
+            detail=isolation_detail,
         )
     )
 

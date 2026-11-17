@@ -1,0 +1,353 @@
+# cJSON — the real-world target.
+#
+# Validates the upstream fix for a heap buffer over-read in parse_object()
+# (upstream issue #800, commit 3ef4e4e) against its own parent commit.
+#
+# Nothing in this file is shared with the toy target's configuration and no
+# code in the tool mentions either target: adding this second program needed a
+# YAML file and a 130-line harness, which is the generalisation requirement
+# (R-SCOPE-08) demonstrated rather than asserted.
+#
+# Prerequisite:
+#   bash targets/cjson/bootstrap.sh     # clones upstream, pins both commits
+#
+# Expected outcome: exit code 0 (PASS) — this is a correct upstream fix.
+# To see the tool reject something here, point --patched-revision at the base
+# commit itself, or at any other revision.
+schema_version: 1
+base_dir: ".."
+
+target:
+  name: cjson
+  description: >-
+    cJSON, a widely used C JSON parser. The base revision contains a heap
+    buffer over-read in parse_object(): after consuming the comma between
+    object members it reads the next byte without checking that the byte is
+    inside the supplied length.
+  language: c
+  repo_path: targets/cjson/repo
+  source_subdir: "."
+  # Tags created by bootstrap.sh for the two pinned commits.
+  base_revision: pv-base          # 826cd6f, parent of the fix
+  patched_revision: pv-patched    # 3ef4e4e, "Fix heap buffer overflow"
+
+builds:
+  # The library is compiled together with the harness in one step. cJSON has
+  # a CMake build, but it also builds the upstream test suite and a shared
+  # library, neither of which this validation needs; compiling the two
+  # translation units directly keeps the build fast and keeps the binary
+  # free of anything but the code under test.
+  - mode: release
+    compiler: gcc
+    cflags: "-std=c99 -O2 -g -fno-omit-frame-pointer"
+    ldflags: "-lm"
+    commands:
+      - ["{compiler}", "{cflags}",
+         "-I{source}",
+         "-o", "{build_dir}/cjson_cli",
+         "{base_dir}/targets/cjson/harness/cjson_cli.c",
+         "{source}/cJSON.c",
+         "{ldflags}"]
+    binary_path: "{build_dir}/cjson_cli"
+
+  - mode: sanitized
+    compiler: gcc
+    cflags: "-std=c99 -O1 -g -fno-omit-frame-pointer -fno-common -fsanitize=address,undefined"
+    ldflags: "-fsanitize=address,undefined -lm"
+    commands:
+      - ["{compiler}", "{cflags}",
+         "-I{source}",
+         "-o", "{build_dir}/cjson_cli",
+         "{base_dir}/targets/cjson/harness/cjson_cli.c",
+         "{source}/cJSON.c",
+         "{ldflags}"]
+    binary_path: "{build_dir}/cjson_cli"
+
+input:
+  method: file
+  argv: ["{input_file}"]
+  filename: input.json
+
+limits:
+  timeout_s: 10
+  memory_mb: 1024
+  cpu_s: 10
+  max_processes: 64
+  max_output_bytes: 1048576
+
+sandbox:
+  backend: bubblewrap
+  network: false
+
+minimization:
+  enabled: true
+  max_iterations: 1500
+  budget_seconds: 90
+
+reproduction:
+  replays: 3
+
+# Every oracle below is derived from RFC 8259 and the documented behaviour of
+# cJSON_ParseWithLength / cJSON_PrintUnformatted. See
+# targets/cjson/SPECIFICATION.md, which records the derivation and the one
+# place where the documented API is deliberately followed instead of a
+# stricter reading of the RFC.
+tests:
+  # -- valid documents -------------------------------------------------
+  - id: valid_object
+    category: valid
+    input: {path: targets/cjson/tests/inputs/valid_object.json}
+    oracle:
+      source: upstream_docs
+      input_validity: valid
+      exit_code: 0
+      stdout: {match: exact, value: "{\"name\":\"cjson\",\"version\":1}\n"}
+      semantics: An object round-trips to its compact form with keys in input order.
+
+  - id: valid_array
+    category: valid
+    input: {path: targets/cjson/tests/inputs/valid_array.json}
+    oracle:
+      source: upstream_docs
+      input_validity: valid
+      exit_code: 0
+      stdout: {match: exact, value: "[1,2,3]\n"}
+      semantics: Array elements keep their order and integer formatting.
+
+  - id: valid_nested
+    category: valid
+    input: {path: targets/cjson/tests/inputs/valid_nested.json}
+    oracle:
+      source: upstream_docs
+      input_validity: valid
+      exit_code: 0
+      stdout: {match: exact, value: "{\"a\":{\"b\":[1,{\"c\":true}]}}\n"}
+      semantics: Nesting of objects inside arrays inside objects is preserved.
+
+  - id: valid_literals
+    category: valid
+    input: {path: targets/cjson/tests/inputs/valid_literals.json}
+    oracle:
+      source: upstream_docs
+      input_validity: valid
+      exit_code: 0
+      stdout: {match: exact, value: "[true,false,null]\n"}
+      semantics: The three JSON literals print as their keywords.
+
+  - id: valid_string
+    category: valid
+    input: {path: targets/cjson/tests/inputs/valid_string.json}
+    oracle:
+      source: upstream_docs
+      input_validity: valid
+      exit_code: 0
+      stdout: {match: exact, value: "\"hello\"\n"}
+      semantics: A bare string is a valid JSON value on its own.
+
+  - id: valid_number_zero
+    category: valid
+    input: {path: targets/cjson/tests/inputs/valid_number_zero.json}
+    oracle:
+      source: upstream_docs
+      input_validity: valid
+      exit_code: 0
+      stdout: {match: exact, value: "0\n"}
+      semantics: Zero prints without a sign or a fractional part.
+
+  - id: valid_negative
+    category: valid
+    input: {path: targets/cjson/tests/inputs/valid_negative.json}
+    oracle:
+      source: upstream_docs
+      input_validity: valid
+      exit_code: 0
+      stdout: {match: exact, value: "-42\n"}
+      semantics: A negative integer keeps its sign and no fractional part.
+
+  # -- boundary --------------------------------------------------------
+  - id: boundary_empty_object
+    category: boundary
+    input: {path: targets/cjson/tests/inputs/boundary_empty_object.json}
+    oracle:
+      source: upstream_docs
+      input_validity: boundary
+      exit_code: 0
+      stdout: {match: exact, value: "{}\n"}
+      semantics: An object with no members is valid.
+
+  - id: boundary_empty_array
+    category: boundary
+    input: {path: targets/cjson/tests/inputs/boundary_empty_array.json}
+    oracle:
+      source: upstream_docs
+      input_validity: boundary
+      exit_code: 0
+      stdout: {match: exact, value: "[]\n"}
+      semantics: An array with no elements is valid.
+
+  - id: boundary_object_in_array
+    category: boundary
+    input: {path: targets/cjson/tests/inputs/boundary_object_in_array.json}
+    oracle:
+      source: upstream_docs
+      input_validity: boundary
+      exit_code: 0
+      stdout: {match: exact, value: "[{\"k\":[]}]\n"}
+      semantics: Empty containers nest without special handling.
+
+  - id: boundary_deep_nesting
+    category: boundary
+    note: 100 levels, well inside cJSON's documented nesting limit of 1000.
+    input: {path: targets/cjson/tests/inputs/boundary_deep_nesting.json}
+    oracle:
+      source: upstream_docs
+      input_validity: boundary
+      exit_code: 0
+      stdout:
+        match: regex
+        value: "^\\[{100}1\\]{100}\n$"
+      semantics: Nesting below the documented limit must be accepted, not rejected.
+
+  - id: boundary_trailing_bytes
+    category: boundary
+    note: >-
+      cJSON_ParseWithLength parses a value from the start of the buffer and
+      does not require the buffer to be consumed. See SPECIFICATION.md 4.2.
+    input: {path: targets/cjson/tests/inputs/boundary_trailing_bytes.json}
+    oracle:
+      source: upstream_docs
+      input_validity: boundary
+      exit_code: 0
+      stdout: {match: exact, value: "{\"a\":1}\n"}
+      semantics: Bytes after a complete value are not an error for this entry point.
+
+  # -- security reproducers --------------------------------------------
+  - id: security_object_truncated_after_comma
+    category: security
+    note: The upstream reproducer for issue #800.
+    input: {path: targets/cjson/tests/inputs/security_object_truncated_after_comma.json}
+    oracle:
+      source: upstream_docs
+      input_validity: invalid
+      exit_code: 1
+      stderr: {match: contains, value: "invalid json"}
+      semantics: >-
+        An object that ends immediately after a member separator is incomplete
+        and must be rejected without reading past the supplied length.
+
+  - id: security_object_truncated_after_comma_alt
+    category: security
+    note: Same defect reached with a different key and value length.
+    input: {path: targets/cjson/tests/inputs/security_object_truncated_after_comma_alt.json}
+    oracle:
+      source: upstream_docs
+      input_validity: invalid
+      exit_code: 1
+      stderr: {match: contains, value: "invalid json"}
+      semantics: The rejection must not depend on the length of the preceding member.
+
+  - id: security_nested_object_truncated
+    category: security
+    note: The same shape one level deeper, reached through a nested object.
+    input: {path: targets/cjson/tests/inputs/security_nested_object_truncated.json}
+    oracle:
+      source: upstream_docs
+      input_validity: invalid
+      exit_code: 1
+      stderr: {match: contains, value: "invalid json"}
+      semantics: Nesting must not change how an incomplete object is handled.
+
+  # -- invalid ---------------------------------------------------------
+  - id: invalid_array_truncated_after_comma
+    category: invalid
+    note: >-
+      Control case. The array path was already correct upstream, so this input
+      should be rejected cleanly by both versions. Its presence shows the
+      object-path finding is a specific defect, not an artefact of truncation.
+    input: {path: targets/cjson/tests/inputs/invalid_array_truncated_after_comma.json}
+    oracle:
+      source: upstream_docs
+      input_validity: invalid
+      exit_code: 1
+      stderr: {match: contains, value: "invalid json"}
+      semantics: An array that ends after a comma is incomplete.
+
+  - id: invalid_empty
+    category: invalid
+    input: {path: targets/cjson/tests/inputs/invalid_empty.json}
+    oracle:
+      source: upstream_docs
+      input_validity: invalid
+      exit_code: 1
+      stderr: {match: contains, value: "invalid json"}
+      semantics: An empty buffer contains no JSON value.
+
+  - id: invalid_unclosed_string
+    category: invalid
+    input: {path: targets/cjson/tests/inputs/invalid_unclosed_string.json}
+    oracle:
+      source: upstream_docs
+      input_validity: invalid
+      exit_code: 1
+      stderr: {match: contains, value: "invalid json"}
+      semantics: A string without a closing quote is incomplete.
+
+  - id: invalid_unclosed_array
+    category: invalid
+    input: {path: targets/cjson/tests/inputs/invalid_unclosed_array.json}
+    oracle:
+      source: upstream_docs
+      input_validity: invalid
+      exit_code: 1
+      stderr: {match: contains, value: "invalid json"}
+      semantics: An array without a closing bracket is incomplete.
+
+  - id: invalid_unclosed_object
+    category: invalid
+    input: {path: targets/cjson/tests/inputs/invalid_unclosed_object.json}
+    oracle:
+      source: upstream_docs
+      input_validity: invalid
+      exit_code: 1
+      stderr: {match: contains, value: "invalid json"}
+      semantics: An object without a closing brace is incomplete.
+
+  - id: invalid_lone_comma
+    category: invalid
+    input: {path: targets/cjson/tests/inputs/invalid_lone_comma.json}
+    oracle:
+      source: upstream_docs
+      input_validity: invalid
+      exit_code: 1
+      stderr: {match: contains, value: "invalid json"}
+      semantics: A separator is not a value.
+
+  - id: invalid_bare_word
+    category: invalid
+    input: {path: targets/cjson/tests/inputs/invalid_bare_word.json}
+    oracle:
+      source: upstream_docs
+      input_validity: invalid
+      exit_code: 1
+      stderr: {match: contains, value: "invalid json"}
+      semantics: Only true, false and null are bare keywords.
+
+  - id: invalid_missing_value
+    category: invalid
+    input: {path: targets/cjson/tests/inputs/invalid_missing_value.json}
+    oracle:
+      source: upstream_docs
+      input_validity: invalid
+      exit_code: 1
+      stderr: {match: contains, value: "invalid json"}
+      semantics: A member needs a value after the colon.
+
+  - id: invalid_missing_colon
+    category: invalid
+    input: {path: targets/cjson/tests/inputs/invalid_missing_colon.json}
+    oracle:
+      source: upstream_docs
+      input_validity: invalid
+      exit_code: 1
+      stderr: {match: contains, value: "invalid json"}
+      semantics: A member needs a colon between its name and its value.

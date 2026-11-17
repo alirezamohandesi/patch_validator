@@ -20,6 +20,10 @@ from ..errors import ConfigError
 
 _TOKEN = re.compile(r"\{([A-Za-z_][A-Za-z0-9_]*)\}")
 
+#: Placeholders whose value is a list of command-line flags rather than a
+#: single value.  Only these expand into several arguments; see render_argv.
+FLAG_PLACEHOLDERS = frozenset({"cflags", "ldflags"})
+
 
 def render(template: str, values: Mapping[str, str]) -> str:
     """Replace known ``{placeholder}`` tokens in ``template``."""
@@ -43,6 +47,7 @@ def render_argv(
     values: Mapping[str, str],
     *,
     context: str = "command",
+    splittable: frozenset[str] = frozenset(),
 ) -> list[str]:
     """Render a configured command into an argv list.
 
@@ -62,7 +67,25 @@ def render_argv(
     if not parts:
         raise ConfigError(f"{context}: empty command")
 
-    rendered = [render(part, values) for part in parts]
-    # Dropping empty arguments keeps optional flag slots such as
-    # "{ldflags}" from turning into a stray empty argv entry.
+    rendered: list[str] = []
+    for part in parts:
+        # A placeholder whose value is a *list of flags* expands to one
+        # argument per word, so "-O2 -g -fsanitize=address" can be handed
+        # straight to a compiler.  Only the placeholders named in
+        # ``splittable`` behave this way, and only when the argument is
+        # nothing but that placeholder:
+        #
+        #   ["gcc", "{cflags}"]              -> gcc -O2 -g -fsanitize=address
+        #   ["cmake", "-DFLAGS={cflags}"]    -> cmake -DFLAGS=-O2 -g -fsan...
+        #
+        # Every other placeholder, paths in particular, stays one argument
+        # however many spaces its value contains.
+        whole = _TOKEN.fullmatch(part)
+        if whole is not None and whole.group(1) in splittable and whole.group(1) in values:
+            rendered.extend(str(values[whole.group(1)]).split())
+            continue
+        rendered.append(render(part, values))
+
+    # Dropping empty arguments keeps optional slots such as "{ldflags}" from
+    # turning into a stray empty argv entry.
     return [part for part in rendered if part != ""]

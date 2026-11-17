@@ -78,6 +78,14 @@ class Pipeline:
         blocking: list[str] = []
 
         self.record.environment = environment.capture()
+        # Populated before anything can fail so that a run which dies during
+        # setup still produces a schema-valid report.  A pipeline that cannot
+        # read the report of a failed run cannot diagnose it (R-CICD-07).
+        self.record.sandbox = {
+            "backend": self.config.sandbox.backend,
+            "isolated": False,
+            "probe": {},
+        }
 
         try:
             probe = sandbox.ensure_available()

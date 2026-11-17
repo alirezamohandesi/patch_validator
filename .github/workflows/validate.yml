@@ -1,0 +1,230 @@
+name: patch validation
+
+# Runs on every change to the tool or the targets, and on demand.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      patched_revision:
+        description: Revision of the target to validate against the base
+        required: false
+        default: correct-patch
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Recorded in every reproducer bundle so a finding can be tied to the exact
+  # image that produced it.
+  PATCH_VALIDATOR_IMAGE_DIGEST: ${{ github.sha }}
+
+jobs:
+  # ---------------------------------------------------------------------
+  # Unit and integration tests for the validator itself.
+  # ---------------------------------------------------------------------
+  tests:
+    name: tool test suite
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            bubblewrap util-linux binutils build-essential cmake
+
+      - name: Install the validator
+        run: pip install -e ".[dev]"
+
+      - name: Check the environment can run the validator
+        run: patch-validator doctor
+
+      - name: Materialise the toy target repository
+        run: bash targets/recparse/bootstrap.sh
+
+      - name: Run the test suite
+        run: pytest -q --junit-xml=test-results.xml
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results.xml
+
+  # ---------------------------------------------------------------------
+  # The validator used as a gate, one job per scenario.  Each scenario has a
+  # documented expected exit code; the job fails if the tool produces a
+  # different one.
+  # ---------------------------------------------------------------------
+  scenarios:
+    name: ${{ matrix.revision }} (expect ${{ matrix.expected_exit }})
+    runs-on: ubuntu-24.04
+    needs: tests
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - revision: correct-patch
+            expected_exit: 0
+          - revision: incomplete-patch
+            expected_exit: 10
+          - revision: regression-patch
+            expected_exit: 20
+
+    steps:
+      # 1. Checkout
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. Environment setup
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # 3. Dependency installation
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            bubblewrap util-linux binutils build-essential cmake
+
+      - name: Install the validator
+        run: pip install -e .
+
+      - name: Verify the sandbox is usable
+        run: patch-validator doctor
+
+      - name: Materialise the toy target repository
+        run: bash targets/recparse/bootstrap.sh
+
+      # 4. Configuration validation
+      - name: Validate the configuration
+        run: |
+          patch-validator check-config \
+            --config configs/recparse.yaml \
+            --patched-revision "${{ matrix.revision }}"
+
+      # 5. Build — all four binaries
+      - name: Build both versions in both modes
+        run: |
+          patch-validator build \
+            --config configs/recparse.yaml \
+            --patched-revision "${{ matrix.revision }}" \
+            --run-dir "runs/${{ matrix.revision }}-build"
+
+      # 6 + 7. Release and sanitized execution, shown as a matrix
+      - name: Execute the test matrix
+        run: |
+          patch-validator test \
+            --config configs/recparse.yaml \
+            --patched-revision "${{ matrix.revision }}" \
+            --run-dir "runs/${{ matrix.revision }}-test"
+
+      # 11. Hardening analysis, reported on its own so a mitigation loss is
+      #     visible even when the security verdict is clean.
+      - name: Compare binary hardening
+        continue-on-error: true
+        run: |
+          patch-validator hardening \
+            --config configs/recparse.yaml \
+            --patched-revision "${{ matrix.revision }}" \
+            --run-dir "runs/${{ matrix.revision }}-hardening"
+
+      # 8, 9, 10, 12. Crash analysis, patch correlation, regression test
+      #     generation and report generation all happen inside one validate
+      #     run, which is also the step that produces the exit code.
+      - name: Validate the patch
+        id: validate
+        continue-on-error: true
+        run: |
+          set +e
+          patch-validator validate \
+            --config configs/recparse.yaml \
+            --patched-revision "${{ matrix.revision }}" \
+            --run-dir "runs/${{ matrix.revision }}"
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Summarise the verdict
+        if: always()
+        run: |
+          patch-validator report --run "runs/${{ matrix.revision }}" --format summary || true
+          {
+            echo "## ${{ matrix.revision }}"
+            echo
+            cat "runs/${{ matrix.revision }}/report.md"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # 13. Artifact upload — always, so a failing run is still diagnosable.
+      - name: Upload the run directory
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: run-${{ matrix.revision }}
+          path: runs/${{ matrix.revision }}
+          if-no-files-found: error
+
+      # 14. Final exit code evaluation.
+      #
+      # The validator's exit code is never discarded and never coerced.  This
+      # step asserts it equals the code the specification defines for this
+      # scenario, so both a false pass and a false failure break the build.
+      - name: Check the exit code
+        run: |
+          actual="${{ steps.validate.outputs.exit_code }}"
+          expected="${{ matrix.expected_exit }}"
+          echo "validator exited with $actual, expected $expected"
+          if [ "$actual" != "$expected" ]; then
+            echo "::error::patch-validator returned $actual for ${{ matrix.revision }}, expected $expected"
+            exit 1
+          fi
+
+  # ---------------------------------------------------------------------
+  # The same tool used the way a real project would: any non-zero verdict on
+  # the revision under review fails the pipeline.
+  # ---------------------------------------------------------------------
+  gate:
+    name: gate on the revision under review
+    runs-on: ubuntu-24.04
+    needs: tests
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            bubblewrap util-linux binutils build-essential cmake
+          pip install -e .
+
+      - name: Materialise the toy target repository
+        run: bash targets/recparse/bootstrap.sh
+
+      - name: Validate
+        run: |
+          patch-validator validate \
+            --config configs/recparse.yaml \
+            --patched-revision "${{ github.event.inputs.patched_revision || 'correct-patch' }}" \
+            --run-dir runs/gate
+
+      - name: Upload the run directory
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: run-gate
+          path: runs/gate

@@ -65,8 +65,8 @@
       }
     },
     "revisions": {
+      "comment": "Empty when the run failed before the sources could be resolved. A failed run still has to produce a readable report, so this is not required to be populated.",
       "type": "object",
-      "required": ["base", "patched"],
       "additionalProperties": {
         "type": "object",
         "required": ["revision", "commit"],

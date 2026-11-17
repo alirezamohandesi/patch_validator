@@ -252,3 +252,32 @@ class TestMinimizer:
         assert result.minimized_size == len(result.minimized)
         expected = round(100 * (10 - result.minimized_size) / 10, 2)
         assert result.reduction_percent == expected
+
+
+class TestFlagExpansion:
+    """Only flag placeholders expand into several arguments."""
+
+    VALUES = {"cflags": "-O2 -g -fsanitize=address", "out": "a path", "ldflags": ""}
+
+    def test_a_flag_placeholder_becomes_several_arguments(self):
+        from patch_validator.util.templating import FLAG_PLACEHOLDERS
+
+        assert render_argv(
+            ["gcc", "{cflags}", "x.c"], self.VALUES, splittable=FLAG_PLACEHOLDERS
+        ) == ["gcc", "-O2", "-g", "-fsanitize=address", "x.c"]
+
+    def test_a_path_with_spaces_stays_one_argument(self):
+        from patch_validator.util.templating import FLAG_PLACEHOLDERS
+
+        assert render_argv(
+            ["cc", "-o", "{out}"], self.VALUES, splittable=FLAG_PLACEHOLDERS
+        ) == ["cc", "-o", "a path"]
+
+    def test_an_embedded_flag_placeholder_is_not_split(self):
+        from patch_validator.util.templating import FLAG_PLACEHOLDERS
+
+        assert render_argv(
+            ["cmake", "-DCMAKE_C_FLAGS={cflags}"],
+            self.VALUES,
+            splittable=FLAG_PLACEHOLDERS,
+        ) == ["cmake", "-DCMAKE_C_FLAGS=-O2 -g -fsanitize=address"]

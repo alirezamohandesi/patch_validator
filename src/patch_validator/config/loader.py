@@ -29,7 +29,17 @@ from .schema import CONFIG_SCHEMA
 
 log = logging.getLogger(__name__)
 
-BUILD_PLACEHOLDERS = ("source", "build_dir", "compiler", "cflags", "ldflags", "jobs")
+BUILD_PLACEHOLDERS = (
+    "source",
+    "build_dir",
+    "compiler",
+    "cflags",
+    "ldflags",
+    "jobs",
+    # Root for paths the configuration ships itself, such as a test
+    # harness that is not part of the target repository.
+    "base_dir",
+)
 INPUT_PLACEHOLDERS = ("input_file", "input_arg", "binary", "workdir")
 
 

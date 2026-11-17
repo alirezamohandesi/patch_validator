@@ -269,3 +269,54 @@ class TestUnseenPatch:
 
         names = {field.name for field in fields(RunFacts)}
         assert not any("revision" in name or "patch_name" in name for name in names)
+
+
+class TestFailedRunReporting:
+    """A run that dies during setup must still be diagnosable."""
+
+    def test_an_unavailable_sandbox_still_produces_a_readable_report(
+        self, tmp_path, monkeypatch
+    ):
+        from patch_validator.artifacts import ArtifactStore
+        from patch_validator.config import load_config
+        from patch_validator.pipeline import Pipeline
+        from patch_validator.sandbox.bubblewrap import BubblewrapSandboxBackend
+
+        monkeypatch.setattr(
+            BubblewrapSandboxBackend,
+            "_smoke_test",
+            lambda self: (False, "simulated namespace failure"),
+        )
+        store = ArtifactStore(tmp_path / "run")
+        pipeline = Pipeline(load_config(CONFIG), artifacts=store, run_id="failed")
+        record = pipeline.run()
+        json_ref, markdown_ref = pipeline.write_reports()
+
+        assert record.exit_code == exit_codes.BUILD_OR_CONFIG_ERROR
+        assert (store.root / json_ref).exists()
+        assert (store.root / markdown_ref).exists()
+        # The report must satisfy the schema even with no revisions resolved,
+        # no builds and no executions.
+        validate_report(json.loads((store.root / json_ref).read_text()))
+
+    def test_the_isolation_check_does_not_blame_executions_that_never_ran(
+        self, tmp_path, monkeypatch
+    ):
+        from patch_validator.artifacts import ArtifactStore
+        from patch_validator.config import load_config
+        from patch_validator.pipeline import Pipeline
+        from patch_validator.sandbox.bubblewrap import BubblewrapSandboxBackend
+
+        monkeypatch.setattr(
+            BubblewrapSandboxBackend, "_smoke_test", lambda self: (False, "simulated")
+        )
+        pipeline = Pipeline(
+            load_config(CONFIG), artifacts=ArtifactStore(tmp_path / "r"), run_id="f"
+        )
+        record = pipeline.run()
+        check = next(
+            item
+            for item in record.classification.mandatory_checks
+            if item.name == "executions_isolated"
+        )
+        assert check.detail == "no execution took place"

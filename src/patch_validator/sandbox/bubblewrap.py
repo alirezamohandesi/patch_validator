@@ -79,13 +79,7 @@ class BubblewrapSandboxBackend:
                 available=False,
                 checks=checks,
                 reason=f"bubblewrap cannot create the required namespaces: {detail}",
-                remedy=(
-                    "run the CI job in a container that permits unprivileged user "
-                    "namespaces, for example with --security-opt seccomp=unconfined "
-                    "and --security-opt apparmor=unconfined, or enable "
-                    "kernel.unprivileged_userns_clone=1 on the host. Do not use "
-                    "--privileged: it is both unnecessary and far broader than needed"
-                ),
+                remedy=_remedy(checks),
             )
 
         return ProbeReport(backend=self.name, available=True, checks=checks)
@@ -204,6 +198,33 @@ class BubblewrapSandboxBackend:
         return decode_signal_exit(result)
 
 
+def _remedy(checks: dict[str, str]) -> str:
+    """Point at the specific thing that is missing, not at bubblewrap."""
+    userns = checks.get("user_namespaces", "")
+    if "apparmor_restrict_unprivileged_userns" in userns:
+        return (
+            "this kernel allows unprivileged user namespaces only for binaries "
+            "covered by an AppArmor profile, which a copy of bubblewrap inside a "
+            "container is not. Run the container with "
+            "--security-opt seccomp=unconfined --security-opt apparmor=unconfined "
+            "--cap-add=SYS_ADMIN, or set "
+            "kernel.apparmor_restrict_unprivileged_userns=0 on the host. "
+            "--privileged also works but grants far more than is needed and "
+            "should not be used"
+        )
+    if "disabled" in userns:
+        return (
+            f"user namespaces are {userns}; enable them on the host, or run the "
+            "job somewhere that permits them"
+        )
+    return (
+        "run the CI job in a container that permits unprivileged user namespaces, "
+        "for example with --security-opt seccomp=unconfined and "
+        "--security-opt apparmor=unconfined. Do not use --privileged: it is both "
+        "unnecessary and far broader than needed"
+    )
+
+
 def _probe_user_namespaces() -> str:
     """Unprivileged user namespaces are what bubblewrap needs most."""
     max_ns = Path("/proc/sys/user/max_user_namespaces")
@@ -220,6 +241,21 @@ def _probe_user_namespaces() -> str:
         try:
             if clone_flag.read_text().strip() == "0":
                 return "disabled (kernel.unprivileged_userns_clone = 0)"
+        except OSError:
+            return "unreadable"
+
+    # Ubuntu 24.04 and later gate unprivileged user namespaces behind an
+    # AppArmor policy.  The host's packaged bubblewrap carries a profile that
+    # permits it, but a copy of bubblewrap inside a container does not, which
+    # is the usual reason this works outside Docker and fails inside it.
+    apparmor_gate = Path("/proc/sys/kernel/apparmor_restrict_unprivileged_userns")
+    if apparmor_gate.exists():
+        try:
+            if apparmor_gate.read_text().strip() == "1":
+                return (
+                    "permitted by profile only "
+                    "(kernel.apparmor_restrict_unprivileged_userns = 1)"
+                )
         except OSError:
             return "unreadable"
 
