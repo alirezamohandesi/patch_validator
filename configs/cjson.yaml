@@ -9,11 +9,13 @@
 # (R-SCOPE-08) demonstrated rather than asserted.
 #
 # Prerequisite:
-#   bash targets/cjson/bootstrap.sh     # clones upstream, pins both commits
+#   bash targets/cjson/bootstrap.sh     # clones upstream, pins the revisions
 #
-# Expected outcome: exit code 0 (PASS) — this is a correct upstream fix.
-# To see the tool reject something here, point --patched-revision at the base
-# commit itself, or at any other revision.
+# Expected outcomes for the four scenarios of this target (bootstrap.sh builds
+# the last two from targets/cjson/patches/ on top of the base commit):
+#   pv-patched      exit 0   (PASS)              upstream fix 3ef4e4e
+#   pv-incomplete   exit 10  (VULN_REMAINS)      check applied to top-level objects only
+#   pv-regression   exit 20  (FUNC_REGRESSION)   correct check + nesting limit lowered to 64
 schema_version: 1
 base_dir: ".."
 
