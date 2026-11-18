@@ -7,8 +7,8 @@
 
 | Tag | File | Description |
 |-----|------|-------------|
-| `SPEC` | [`docs/project-spec.pdf`](project-spec.pdf) | سند رسمی درس (مدرس: سولماز سلیمی) — **مرجع اصلی / قانون صفر** |
-| `PROMPT` | [`docs/prompt.pdf`](prompt.pdf) | سند راهنمای پیاده‌سازی (۲۶ مرحله) |
+| `SPEC` | صورت پروژه (خارج از مخزن) | سند رسمی درس (مدرس: سولماز سلیمی) — **مرجع اصلی / قانون صفر** |
+| `PROMPT` | سند راهنما (خارج از مخزن) | سند راهنمای پیاده‌سازی (۲۶ مرحله) |
 
 **Conflict rule.** هر جا `PROMPT` با `SPEC` اختلاف داشت، `SPEC` اولویت دارد. اختلاف‌های
 شناسایی‌شده در بخش [Conflicts and assumptions](#conflicts-and-assumptions) ثبت شده‌اند.

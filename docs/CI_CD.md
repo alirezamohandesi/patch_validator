@@ -146,6 +146,35 @@ on:
 همین مسیر، سناریوی **وصلهٔ دیده‌نشده** را پوشش می‌دهد: یک revision دلخواه بدهید و ابزار
 آن را با همان پایه، همان آزمون‌ها و همان Oracleها ارزیابی می‌کند.
 
+## اجرای عملی در مخازن هدف
+
+علاوه بر workflow خود ابزار، patch-validator به‌شکل یک job در پایپ‌لاین دو مخزن C به‌کار رفته
+است. در هر دو مخزن، `main` نسخهٔ آسیب‌پذیر است و هر توسعه‌دهنده وصلهٔ خود را در شاخه‌ای جدا
+push می‌کند:
+
+- recparse: <https://github.com/alirezamohandesi/security_project/actions>
+- cJSON: <https://github.com/alirezamohandesi/Cjson_security/actions>
+
+```
+prepare ─┬─ static-analysis ───────────────────────────────┐
+         ├─ build (gcc|clang × release|sanitized) ─┬─ functional-tests ─┤
+         │                                         └─ patch-validator ──┤
+         └──────────────────────────────────────────────────────────────┴─ verdict
+```
+
+| Job | کار |
+|-----|-----|
+| `prepare` | `base` = merge-base با `main`، `patched` = commit پوش‌شده؛ تولید `patch.diff` |
+| `static analysis` | `cppcheck` و `gcc -fanalyzer` (اطلاعاتی، مسدودکننده نیست) |
+| `build` | چهار build با `-Werror`؛ وصله‌ای که تمیز کامپایل نشود همین‌جا رد می‌شود |
+| `functional tests` | اجرای سریع باینری sanitized روی ورودی‌های valid/boundary/invalid |
+| `patch-validator` | `doctor` → `check-config` → `hardening` → `validate` → `regression` → گزارش و artifact |
+| `verdict` | یک status check واحد از همهٔ نتایج |
+
+پیکربندی، Oracleها و ورودی‌های آزمون همیشه از **نسخهٔ پایه** خوانده می‌شوند، نه از شاخهٔ وصله،
+تا وصله نتواند با تغییر تست‌های خودش قبول شود. نسخهٔ ابزار در workflow روی یک commit مشخص
+pin شده است.
+
 ## بازتولید محلی یک اجرای CI
 
 ```bash

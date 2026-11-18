@@ -102,20 +102,43 @@ echo "exit code: $?"
 | [`recparse`](targets/recparse/) | اسباب‌بازی (ساختهٔ ما) | stack buffer overflow در تابع کپی مشترک | [`configs/recparse.yaml`](configs/recparse.yaml) |
 | [`cjson`](targets/cjson/) | **پروژهٔ واقعی** ([cJSON](https://github.com/DaveGamble/cJSON)) | heap buffer over-read در `parse_object()`، commit رفع `3ef4e4e` | [`configs/cjson.yaml`](configs/cjson.yaml) |
 
-هدف اسباب‌بازی چهار نسخه دارد تا هر چهار سناریوی ارزیابی به‌صورت قطعی پوشش داده شوند:
+هر دو هدف چهار نسخه دارند (پایهٔ آسیب‌پذیر، وصلهٔ درست، وصلهٔ ناقص، وصلهٔ مخرب عملکرد) تا
+هر چهار سناریوی ارزیابی به‌صورت قطعی پوشش داده شوند:
 
 ```bash
+bash targets/recparse/bootstrap.sh
 patch-validator validate --config configs/recparse.yaml --patched-revision correct-patch       # 0
 patch-validator validate --config configs/recparse.yaml --patched-revision incomplete-patch    # 10
 patch-validator validate --config configs/recparse.yaml --patched-revision regression-patch    # 20
 ```
 
-هدف واقعی به دریافت منبع از شبکه نیاز دارد:
+هدف واقعی به دریافت منبع از شبکه نیاز دارد. وصلهٔ درست همان commit رفع بالادست است و دو
+وصلهٔ دیگر را `bootstrap.sh` از [`targets/cjson/patches/`](targets/cjson/patches/) روی commit پایه
+می‌سازد (با hash ثابت و قابل تکرار):
 
 ```bash
 bash targets/cjson/bootstrap.sh
-patch-validator validate --config configs/cjson.yaml     # 0
+patch-validator validate --config configs/cjson.yaml --patched-revision pv-patched       # 0
+patch-validator validate --config configs/cjson.yaml --patched-revision pv-incomplete    # 10  بررسی فقط برای object سطح بالا
+patch-validator validate --config configs/cjson.yaml --patched-revision pv-regression    # 20  حد تودرتویی 1000 → 64
 ```
+
+خروجی کامل هر شش سناریو (گزارش JSON و Markdown، diff، بسته‌های بازتولید، ورودی‌های
+کوچک‌شده و suite رگرسیون) در [`results/`](results/) قرار دارد.
+
+## اجرای عملی در CI/CD
+
+ابزار به‌عنوان یک job در پایپ‌لاین GitHub Actions دو مخزن جداگانه به‌کار رفته است. در هر
+مخزن، شاخهٔ `main` نسخهٔ آسیب‌پذیر است و هر وصله در یک شاخهٔ جدا push شده است:
+
+| مخزن | هدف | اجرای پایپ‌لاین‌ها |
+|------|-----|---------------------|
+| [security_project](https://github.com/alirezamohandesi/security_project) | recparse | <https://github.com/alirezamohandesi/security_project/actions> |
+| [Cjson_security](https://github.com/alirezamohandesi/Cjson_security) | cJSON | <https://github.com/alirezamohandesi/Cjson_security/actions> |
+
+پایپ‌لاین هر مخزن: `prepare` → `static analysis` و `build` (gcc/clang × release/sanitized) →
+`functional tests` و `patch-validator` → `verdict`. وصلهٔ درست سبز می‌شود و وصلهٔ ناقص و
+مخرب با کدهای ۱۰ و ۲۰ پایپ‌لاین را می‌شکنند. جزئیات در [`docs/CI_CD.md`](docs/CI_CD.md).
 
 ## افزودن برنامهٔ هدف جدید
 
