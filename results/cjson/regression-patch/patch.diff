@@ -1,0 +1,29 @@
+diff --git a/cJSON.c b/cJSON.c
+index 4f5b38d..97564bb 100644
+--- a/cJSON.c
++++ b/cJSON.c
+@@ -1660,6 +1660,11 @@ static cJSON_bool parse_object(cJSON * const item, parse_buffer * const input_bu
+             current_item = new_item;
+         }
+ 
++        if (cannot_access_at_index(input_buffer, 1))
++        {
++            goto fail; /* nothing comes after the comma */
++        }
++
+         /* parse the name of the child */
+         input_buffer->offset++;
+         buffer_skip_whitespace(input_buffer);
+diff --git a/cJSON.h b/cJSON.h
+index 218cc9e..c4cee05 100644
+--- a/cJSON.h
++++ b/cJSON.h
+@@ -134,7 +134,7 @@ typedef int cJSON_bool;
+ /* Limits how deeply nested arrays/objects can be before cJSON rejects to parse them.
+  * This is to prevent stack overflows. */
+ #ifndef CJSON_NESTING_LIMIT
+-#define CJSON_NESTING_LIMIT 1000
++#define CJSON_NESTING_LIMIT 64
+ #endif
+ 
+ /* returns the version of cJSON as a string */

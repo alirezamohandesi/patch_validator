@@ -1,0 +1,22 @@
+tests:
+- id: regression_vuln_text_long_901649ba
+  category: security
+  note: generated from finding sec/vuln_text_long/release; minimized reproducer for
+    BUFFER_OVERFLOW at unknown
+  input:
+    path: regression/regression_vuln_text_long_901649ba/input.bin
+  oracle:
+    source: specification
+    input_validity: invalid
+    instructor_approved: pending
+    exit_code: 2
+    stdout:
+      match: exact
+      value: 'records: 1
+
+        '
+    stderr:
+      match: contains
+      value: too long
+    semantics: An over-long TEXT record must be rejected without any out-of-bounds
+      write.

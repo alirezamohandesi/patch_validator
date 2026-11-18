@@ -1,0 +1,28 @@
+{
+  "base": {
+    "must_fault": true,
+    "error_type": "STACK_BUFFER_OVERFLOW",
+    "location_signature": "9282e2706f43a1ff435553168e3a687c2b4b31513b3744d5fb70381b7b4d8906",
+    "location": "src/record.c:22",
+    "detection_mechanism": "address_sanitizer"
+  },
+  "patched": {
+    "must_fault": false,
+    "oracle": {
+      "source": "specification",
+      "input_validity": "boundary",
+      "instructor_approved": "pending",
+      "exit_code": 2,
+      "stdout": {
+        "match": "exact",
+        "value": "records: 1\n"
+      },
+      "stderr": {
+        "match": "contains",
+        "value": "too long"
+      },
+      "semantics": "Length 32 must be rejected, not truncated and not processed."
+    }
+  },
+  "build_mode": "sanitized"
+}

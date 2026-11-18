@@ -1,0 +1,59 @@
+{
+  "suite_version": 1,
+  "cases": [
+    {
+      "id": "regression_security_object_truncated_after_comma_70b71985",
+      "source_finding": "sec/security_object_truncated_after_comma/sanitized",
+      "source_test_id": "security_object_truncated_after_comma",
+      "build_mode": "sanitized",
+      "input_sha256": "70b719852671c82ae4508bc308c00a864dbbb9f38aea282e8130d61981b6acc1",
+      "input_size": 6,
+      "input_ref": "regression/regression_security_object_truncated_after_comma_70b71985/input.bin",
+      "expectations": {
+        "base": {
+          "must_fault": true,
+          "error_type": "HEAP_BUFFER_OVERFLOW",
+          "location_signature": "9d99d0e333e7e23fcc1456bbfc6a02b37116b44a92d961d9845f2cdf5e01a400",
+          "location": "cJSON.c:787",
+          "detection_mechanism": "address_sanitizer"
+        },
+        "patched": {
+          "must_fault": false,
+          "oracle": {
+            "source": "upstream_docs",
+            "input_validity": "invalid",
+            "instructor_approved": "pending",
+            "exit_code": 1,
+            "stderr": {
+              "match": "contains",
+              "value": "invalid json"
+            },
+            "semantics": "An object that ends immediately after a member separator is incomplete and must be rejected without reading past the supplied length."
+          }
+        },
+        "build_mode": "sanitized"
+      },
+      "test_case": {
+        "id": "regression_security_object_truncated_after_comma_70b71985",
+        "category": "security",
+        "note": "generated from finding sec/security_object_truncated_after_comma/sanitized; minimized reproducer for HEAP_BUFFER_OVERFLOW at cJSON.c:787",
+        "input": {
+          "path": "regression/regression_security_object_truncated_after_comma_70b71985/input.bin"
+        },
+        "oracle": {
+          "source": "upstream_docs",
+          "input_validity": "invalid",
+          "instructor_approved": "pending",
+          "exit_code": 1,
+          "stderr": {
+            "match": "contains",
+            "value": "invalid json"
+          },
+          "semantics": "An object that ends immediately after a member separator is incomplete and must be rejected without reading past the supplied length."
+        }
+      },
+      "case_ref": "regression/regression_security_object_truncated_after_comma_70b71985/testcase.yaml",
+      "notes": []
+    }
+  ]
+}

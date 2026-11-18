@@ -1,0 +1,28 @@
+{
+  "base": {
+    "must_fault": true,
+    "error_type": "BUFFER_OVERFLOW",
+    "location_signature": "29a059abcc6d821344e945918e6ca54242567fc58338946214d41dcf15b92dea",
+    "location": "",
+    "detection_mechanism": "fortify_source"
+  },
+  "patched": {
+    "must_fault": false,
+    "oracle": {
+      "source": "specification",
+      "input_validity": "invalid",
+      "instructor_approved": "pending",
+      "exit_code": 2,
+      "stdout": {
+        "match": "exact",
+        "value": "records: 1\n"
+      },
+      "stderr": {
+        "match": "contains",
+        "value": "too long"
+      },
+      "semantics": "An over-long TEXT record must be rejected without any out-of-bounds write."
+    }
+  },
+  "build_mode": "release"
+}

@@ -1,0 +1,18 @@
+finding       boundary_text32 (base, sanitized)
+error type    STACK_BUFFER_OVERFLOW
+detected by   address_sanitizer
+confidence    high
+location      src/record.c:22
+signature     3c746c3d8d9ba68cecee7a9a7777e1c26023b91d635e320669481baac87949a1
+location sig  9282e2706f43a1ff435553168e3a687c2b4b31513b3744d5fb70381b7b4d8906
+message       AddressSanitizer: stack-buffer-overflowon address 0x7bfb24300040 at pc 0x647dc5c78cc8 bp 0x7ffcf0bd8480 sp 0x7ffcf0bd8470
+
+stack trace:
+  #0 0x647dc5c78cc7 in copy_payload /tmp/patch-validator-20261118T125435Z-pfun0_j7/src/base/src/record.c:22
+  #1 0x647dc5c7927e in handle_text /tmp/patch-validator-20261118T125435Z-pfun0_j7/src/base/src/record.c:30
+  #2 0x647dc5c7927e in parse_stream /tmp/patch-validator-20261118T125435Z-pfun0_j7/src/base/src/record.c:102
+  #3 0x647dc5c78a75 in main /tmp/patch-validator-20261118T125435Z-pfun0_j7/src/base/src/main.c:78
+  #4 0x7bfb2662a1c9 in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+  #5 0x7bfb2662a28a in __libc_start_main_impl ../csu/libc-start.c:360
+  #6 0x647dc5c78404 in _start (/tmp/patch-validator-20261118T125435Z-pfun0_j7/build/base.sanitized/recparse+0x3404) (BuildId: a59df0b1be06e1ca9fd9a0a4c292a8a5a6110089)
+  #0 0x647dc5c78cdd in parse_stream /tmp/patch-validator-20261118T125435Z-pfun0_j7/src/base/src/record.c:71

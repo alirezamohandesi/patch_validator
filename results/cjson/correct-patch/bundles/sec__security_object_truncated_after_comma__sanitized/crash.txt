@@ -1,0 +1,25 @@
+finding       security_object_truncated_after_comma (base, sanitized)
+error type    HEAP_BUFFER_OVERFLOW
+detected by   address_sanitizer
+confidence    high
+location      cJSON.c:787
+signature     90764e7c83cc36ec98550b2b2553924e768cc54839079afad59d99f6b832fc8a
+location sig  9d99d0e333e7e23fcc1456bbfc6a02b37116b44a92d961d9845f2cdf5e01a400
+message       AddressSanitizer: heap-buffer-overflowon address 0x502000000017 at pc 0x645808592559 bp 0x7ffecb0b05f0 sp 0x7ffecb0b05e0
+
+stack trace:
+  #0 0x645808592558 in parse_string /tmp/patch-validator-20261118T125505Z-s_ytdzcy/src/base/cJSON.c:787
+  #1 0x64580859adb2 in parse_object /tmp/patch-validator-20261118T125505Z-s_ytdzcy/src/base/cJSON.c:1666
+  #2 0x64580859adb2 in parse_value /tmp/patch-validator-20261118T125505Z-s_ytdzcy/src/base/cJSON.c:1366
+  #3 0x64580859c189 in cJSON_ParseWithLengthOpts /tmp/patch-validator-20261118T125505Z-s_ytdzcy/src/base/cJSON.c:1126
+  #4 0x64580859c4f5 in cJSON_ParseWithLength /tmp/patch-validator-20261118T125505Z-s_ytdzcy/src/base/cJSON.c:1188
+  #5 0x645808591ccc in main /tmp/claude-1000/-home-alireza-Desktop-security-project/bdf060c1-e9f7-47a3-8a11-95ad23ab9263/scratchpad/pv/targets/cjson/harness/cjson_cli.c:122
+  #6 0x7549f982a1c9 in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+  #7 0x7549f982a28a in __libc_start_main_impl ../csu/libc-start.c:360
+  #8 0x645808591534 in _start (/tmp/patch-validator-20261118T125505Z-s_ytdzcy/build/base.sanitized/cjson_cli+0x1c534) (BuildId: 9753b5459442d735f0b86885ffee639525ba1bd1)
+  #0 0x7549fa4fd9c7 in malloc ../../../../src/libsanitizer/asan/asan_malloc_linux.cpp:69
+  #1 0x645808591b0b in read_all /tmp/claude-1000/-home-alireza-Desktop-security-project/bdf060c1-e9f7-47a3-8a11-95ad23ab9263/scratchpad/pv/targets/cjson/harness/cjson_cli.c:77
+  #2 0x645808591b0b in main /tmp/claude-1000/-home-alireza-Desktop-security-project/bdf060c1-e9f7-47a3-8a11-95ad23ab9263/scratchpad/pv/targets/cjson/harness/cjson_cli.c:110
+  #3 0x7549f982a1c9 in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+  #4 0x7549f982a28a in __libc_start_main_impl ../csu/libc-start.c:360
+  #5 0x645808591534 in _start (/tmp/patch-validator-20261118T125505Z-s_ytdzcy/build/base.sanitized/cjson_cli+0x1c534) (BuildId: 9753b5459442d735f0b86885ffee639525ba1bd1)

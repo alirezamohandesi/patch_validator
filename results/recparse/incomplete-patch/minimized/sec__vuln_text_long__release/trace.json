@@ -1,0 +1,1591 @@
+[
+  {
+    "iteration": 1,
+    "size": 104,
+    "granularity": 2,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 2,
+    "size": 104,
+    "granularity": 2,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 3,
+    "size": 156,
+    "granularity": 4,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 4,
+    "size": 156,
+    "granularity": 4,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 4,
+    "size": 156,
+    "granularity": 4,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 4,
+    "size": 156,
+    "granularity": 4,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 5,
+    "size": 182,
+    "granularity": 8,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 6,
+    "size": 182,
+    "granularity": 8,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 6,
+    "size": 182,
+    "granularity": 8,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 6,
+    "size": 182,
+    "granularity": 8,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 6,
+    "size": 182,
+    "granularity": 8,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 6,
+    "size": 182,
+    "granularity": 8,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 6,
+    "size": 182,
+    "granularity": 8,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 6,
+    "size": 182,
+    "granularity": 8,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 7,
+    "size": 195,
+    "granularity": 16,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 8,
+    "size": 195,
+    "granularity": 16,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 8,
+    "size": 195,
+    "granularity": 16,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 8,
+    "size": 195,
+    "granularity": 16,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 8,
+    "size": 195,
+    "granularity": 16,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 8,
+    "size": 195,
+    "granularity": 16,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 8,
+    "size": 195,
+    "granularity": 16,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 8,
+    "size": 195,
+    "granularity": 16,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 8,
+    "size": 195,
+    "granularity": 16,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 8,
+    "size": 195,
+    "granularity": 16,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 8,
+    "size": 195,
+    "granularity": 16,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 8,
+    "size": 195,
+    "granularity": 16,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 8,
+    "size": 195,
+    "granularity": 16,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 8,
+    "size": 195,
+    "granularity": 16,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 8,
+    "size": 195,
+    "granularity": 16,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 8,
+    "size": 195,
+    "granularity": 16,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 9,
+    "size": 201,
+    "granularity": 32,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 10,
+    "size": 201,
+    "granularity": 32,
+    "accepted": true,
+    "cached": false
+  },
+  {
+    "iteration": 11,
+    "size": 194,
+    "granularity": 31,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 12,
+    "size": 194,
+    "granularity": 31,
+    "accepted": true,
+    "cached": false
+  },
+  {
+    "iteration": 13,
+    "size": 187,
+    "granularity": 30,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 14,
+    "size": 187,
+    "granularity": 30,
+    "accepted": true,
+    "cached": false
+  },
+  {
+    "iteration": 15,
+    "size": 180,
+    "granularity": 29,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 16,
+    "size": 180,
+    "granularity": 29,
+    "accepted": true,
+    "cached": false
+  },
+  {
+    "iteration": 17,
+    "size": 173,
+    "granularity": 28,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 18,
+    "size": 173,
+    "granularity": 28,
+    "accepted": true,
+    "cached": false
+  },
+  {
+    "iteration": 19,
+    "size": 166,
+    "granularity": 27,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 20,
+    "size": 166,
+    "granularity": 27,
+    "accepted": true,
+    "cached": false
+  },
+  {
+    "iteration": 21,
+    "size": 159,
+    "granularity": 26,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 22,
+    "size": 159,
+    "granularity": 26,
+    "accepted": true,
+    "cached": false
+  },
+  {
+    "iteration": 23,
+    "size": 152,
+    "granularity": 25,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 24,
+    "size": 152,
+    "granularity": 25,
+    "accepted": true,
+    "cached": false
+  },
+  {
+    "iteration": 25,
+    "size": 145,
+    "granularity": 24,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 26,
+    "size": 145,
+    "granularity": 24,
+    "accepted": true,
+    "cached": false
+  },
+  {
+    "iteration": 27,
+    "size": 138,
+    "granularity": 23,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 28,
+    "size": 138,
+    "granularity": 23,
+    "accepted": true,
+    "cached": false
+  },
+  {
+    "iteration": 29,
+    "size": 131,
+    "granularity": 22,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 30,
+    "size": 131,
+    "granularity": 22,
+    "accepted": true,
+    "cached": false
+  },
+  {
+    "iteration": 31,
+    "size": 124,
+    "granularity": 21,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 32,
+    "size": 124,
+    "granularity": 21,
+    "accepted": true,
+    "cached": false
+  },
+  {
+    "iteration": 33,
+    "size": 117,
+    "granularity": 20,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 34,
+    "size": 117,
+    "granularity": 20,
+    "accepted": true,
+    "cached": false
+  },
+  {
+    "iteration": 35,
+    "size": 110,
+    "granularity": 19,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 36,
+    "size": 110,
+    "granularity": 19,
+    "accepted": true,
+    "cached": false
+  },
+  {
+    "iteration": 37,
+    "size": 103,
+    "granularity": 18,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 38,
+    "size": 103,
+    "granularity": 18,
+    "accepted": true,
+    "cached": false
+  },
+  {
+    "iteration": 39,
+    "size": 96,
+    "granularity": 17,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 40,
+    "size": 97,
+    "granularity": 17,
+    "accepted": true,
+    "cached": false
+  },
+  {
+    "iteration": 41,
+    "size": 90,
+    "granularity": 16,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 42,
+    "size": 91,
+    "granularity": 16,
+    "accepted": true,
+    "cached": false
+  },
+  {
+    "iteration": 43,
+    "size": 84,
+    "granularity": 15,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 44,
+    "size": 85,
+    "granularity": 15,
+    "accepted": true,
+    "cached": false
+  },
+  {
+    "iteration": 45,
+    "size": 78,
+    "granularity": 14,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 46,
+    "size": 79,
+    "granularity": 14,
+    "accepted": true,
+    "cached": false
+  },
+  {
+    "iteration": 47,
+    "size": 72,
+    "granularity": 13,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 48,
+    "size": 73,
+    "granularity": 13,
+    "accepted": true,
+    "cached": false
+  },
+  {
+    "iteration": 49,
+    "size": 66,
+    "granularity": 12,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 50,
+    "size": 67,
+    "granularity": 12,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 50,
+    "size": 67,
+    "granularity": 12,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 50,
+    "size": 67,
+    "granularity": 12,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 50,
+    "size": 67,
+    "granularity": 12,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 50,
+    "size": 67,
+    "granularity": 12,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 50,
+    "size": 67,
+    "granularity": 12,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 50,
+    "size": 67,
+    "granularity": 12,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 50,
+    "size": 67,
+    "granularity": 12,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 50,
+    "size": 67,
+    "granularity": 12,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 50,
+    "size": 67,
+    "granularity": 12,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 50,
+    "size": 67,
+    "granularity": 12,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 51,
+    "size": 69,
+    "granularity": 24,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 52,
+    "size": 70,
+    "granularity": 24,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 53,
+    "size": 70,
+    "granularity": 24,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 53,
+    "size": 70,
+    "granularity": 24,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 53,
+    "size": 70,
+    "granularity": 24,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 53,
+    "size": 70,
+    "granularity": 24,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 53,
+    "size": 70,
+    "granularity": 24,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 53,
+    "size": 70,
+    "granularity": 24,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 53,
+    "size": 70,
+    "granularity": 24,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 53,
+    "size": 70,
+    "granularity": 24,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 53,
+    "size": 70,
+    "granularity": 24,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 53,
+    "size": 70,
+    "granularity": 24,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 53,
+    "size": 70,
+    "granularity": 24,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 53,
+    "size": 70,
+    "granularity": 24,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 53,
+    "size": 70,
+    "granularity": 24,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 53,
+    "size": 70,
+    "granularity": 24,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 53,
+    "size": 70,
+    "granularity": 24,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 53,
+    "size": 70,
+    "granularity": 24,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 53,
+    "size": 70,
+    "granularity": 24,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 53,
+    "size": 70,
+    "granularity": 24,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 53,
+    "size": 70,
+    "granularity": 24,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 53,
+    "size": 70,
+    "granularity": 24,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 53,
+    "size": 70,
+    "granularity": 24,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 53,
+    "size": 70,
+    "granularity": 24,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 54,
+    "size": 71,
+    "granularity": 48,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 55,
+    "size": 71,
+    "granularity": 48,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 56,
+    "size": 71,
+    "granularity": 48,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 57,
+    "size": 71,
+    "granularity": 48,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 58,
+    "size": 71,
+    "granularity": 48,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 58,
+    "size": 71,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 58,
+    "size": 71,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 58,
+    "size": 71,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 58,
+    "size": 71,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 58,
+    "size": 71,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 58,
+    "size": 71,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 58,
+    "size": 71,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 58,
+    "size": 71,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 58,
+    "size": 71,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 58,
+    "size": 71,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 58,
+    "size": 71,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 58,
+    "size": 71,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 58,
+    "size": 71,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 58,
+    "size": 71,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 58,
+    "size": 71,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 58,
+    "size": 71,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 58,
+    "size": 71,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 58,
+    "size": 71,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 58,
+    "size": 71,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 58,
+    "size": 71,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 59,
+    "size": 72,
+    "granularity": 48,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 59,
+    "size": 72,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 59,
+    "size": 72,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 59,
+    "size": 72,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 59,
+    "size": 72,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 59,
+    "size": 72,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 59,
+    "size": 72,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 59,
+    "size": 72,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 59,
+    "size": 72,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 59,
+    "size": 72,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 59,
+    "size": 72,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 59,
+    "size": 72,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 59,
+    "size": 72,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 59,
+    "size": 72,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 59,
+    "size": 72,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 59,
+    "size": 72,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 59,
+    "size": 72,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 59,
+    "size": 72,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 59,
+    "size": 72,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 59,
+    "size": 72,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 59,
+    "size": 72,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 59,
+    "size": 72,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 59,
+    "size": 72,
+    "granularity": 48,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 60,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 61,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 62,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 63,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 64,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 65,
+    "size": 72,
+    "granularity": 73,
+    "accepted": false,
+    "cached": true
+  }
+]

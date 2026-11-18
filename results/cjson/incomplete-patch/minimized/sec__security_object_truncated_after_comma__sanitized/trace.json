@@ -1,0 +1,107 @@
+[
+  {
+    "iteration": 1,
+    "size": 3,
+    "granularity": 2,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 2,
+    "size": 4,
+    "granularity": 2,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 3,
+    "size": 5,
+    "granularity": 4,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 4,
+    "size": 5,
+    "granularity": 4,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 5,
+    "size": 5,
+    "granularity": 4,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 6,
+    "size": 6,
+    "granularity": 4,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 7,
+    "size": 6,
+    "granularity": 7,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 8,
+    "size": 6,
+    "granularity": 7,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 9,
+    "size": 6,
+    "granularity": 7,
+    "accepted": true,
+    "cached": false
+  },
+  {
+    "iteration": 10,
+    "size": 5,
+    "granularity": 6,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 10,
+    "size": 5,
+    "granularity": 6,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 10,
+    "size": 5,
+    "granularity": 6,
+    "accepted": false,
+    "cached": true
+  },
+  {
+    "iteration": 11,
+    "size": 5,
+    "granularity": 6,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 12,
+    "size": 5,
+    "granularity": 6,
+    "accepted": false,
+    "cached": false
+  },
+  {
+    "iteration": 13,
+    "size": 5,
+    "granularity": 6,
+    "accepted": false,
+    "cached": false
+  }
+]

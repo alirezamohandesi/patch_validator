@@ -1,0 +1,21 @@
+tests:
+- id: regression_boundary_raw32_83e50dc6
+  category: security
+  note: generated from finding sec/boundary_raw32/sanitized; minimized reproducer
+    for STACK_BUFFER_OVERFLOW at src/record.c:22
+  input:
+    path: regression/regression_boundary_raw32_83e50dc6/input.bin
+  oracle:
+    source: specification
+    input_validity: boundary
+    instructor_approved: pending
+    exit_code: 2
+    stdout:
+      match: exact
+      value: 'records: 1
+
+        '
+    stderr:
+      match: contains
+      value: too long
+    semantics: Length 32 must be rejected for RAW as well as TEXT.

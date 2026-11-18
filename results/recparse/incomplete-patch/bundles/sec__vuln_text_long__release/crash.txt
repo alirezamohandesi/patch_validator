@@ -1,0 +1,13 @@
+finding       vuln_text_long (base, release)
+error type    BUFFER_OVERFLOW
+detected by   fortify_source
+confidence    high
+location      unknown
+signature     29a059abcc6d821344e945918e6ca54242567fc58338946214d41dcf15b92dea
+location sig  29a059abcc6d821344e945918e6ca54242567fc58338946214d41dcf15b92dea
+message       buffer overflow detected
+
+stack trace:
+
+notes:
+  - detected by a runtime check in the C library, which reports that a bound was violated but not where the write began

@@ -1,0 +1,181 @@
+{
+  "bundle_version": "1.0",
+  "finding_id": "sec/vuln_text_long/release",
+  "target": {
+    "name": "recparse",
+    "repo_path": "/tmp/claude-1000/-home-alireza-Desktop-security-project/bdf060c1-e9f7-47a3-8a11-95ad23ab9263/scratchpad/pv/targets/recparse/repo",
+    "source_subdir": "."
+  },
+  "test_case": {
+    "id": "vuln_text_long",
+    "category": "security",
+    "note": "Original reproducer, reaches the copy helper through handle_text."
+  },
+  "version": "base",
+  "commit": "9d8c9fe9666bfb20611f3ea388bdac598b3bdda0",
+  "revision": "base",
+  "build": {
+    "mode": "release",
+    "compiler": "gcc",
+    "compiler_version": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+    "cflags": "-O2 -g -fno-omit-frame-pointer",
+    "ldflags": "",
+    "commands": [
+      [
+        "cmake",
+        "-S",
+        "/tmp/patch-validator-20261118T125455Z-4x9g4sjs/src/base",
+        "-B",
+        "/tmp/patch-validator-20261118T125455Z-4x9g4sjs/build/base.release",
+        "-DCMAKE_BUILD_TYPE=None",
+        "-DCMAKE_C_COMPILER=gcc",
+        "-DCMAKE_C_FLAGS=-O2 -g -fno-omit-frame-pointer",
+        "-DCMAKE_EXE_LINKER_FLAGS="
+      ],
+      [
+        "cmake",
+        "--build",
+        "/tmp/patch-validator-20261118T125455Z-4x9g4sjs/build/base.release",
+        "--parallel",
+        "12"
+      ]
+    ],
+    "binary_path": "/tmp/patch-validator-20261118T125455Z-4x9g4sjs/build/base.release/recparse",
+    "binary_sha256": "fb9dfcf54b9ac0f37c22ff85a8d8a1cab5179a5ff4af9e15432dc09c97da05cf"
+  },
+  "input": {
+    "method": "file",
+    "argv_template": [
+      "{input_file}"
+    ],
+    "filename": "input.bin",
+    "original_sha256": "e476b45bd6b4c7b5ec56ba249a05de89b09d112988b6e04c8a6490625bb9344b",
+    "original_size": 208,
+    "minimized_sha256": "901649ba33b9141d42b5e84b26afb97afc3d4ed3107c8c71bea5835fff97a675",
+    "minimized_size": 73
+  },
+  "minimization": {
+    "finding_id": "sec/vuln_text_long/release",
+    "original_size": 208,
+    "minimized_size": 73,
+    "reduction_percent": 64.9,
+    "original_sha256": "e476b45bd6b4c7b5ec56ba249a05de89b09d112988b6e04c8a6490625bb9344b",
+    "minimized_sha256": "901649ba33b9141d42b5e84b26afb97afc3d4ed3107c8c71bea5835fff97a675",
+    "iterations": 65,
+    "duration_s": 3.069,
+    "stop_reason": "no further reduction possible",
+    "predicate": "the execution still reports crash signature 29a059abcc6d8213… (BUFFER_OVERFLOW at an unknown location)",
+    "verified": false,
+    "original_ref": "",
+    "minimized_ref": "",
+    "trace_ref": "",
+    "notes": []
+  },
+  "execution": {
+    "command": null,
+    "environment": {},
+    "timeout_s": 10,
+    "resource_limits": {
+      "memory_mb": 1024,
+      "cpu_s": 10,
+      "max_processes": 64,
+      "max_output_bytes": 1048576
+    }
+  },
+  "sandbox": {
+    "backend": "bubblewrap",
+    "network": false
+  },
+  "crash": {
+    "test_id": "vuln_text_long",
+    "version": "base",
+    "build_mode": "release",
+    "outcome": "security_event",
+    "error_type": "BUFFER_OVERFLOW",
+    "detection_mechanism": "fortify_source",
+    "confidence": "high",
+    "termination": {
+      "exit_code": 134,
+      "signal": 6,
+      "signal_name": "SIGABRT",
+      "signal_inferred": true,
+      "timed_out": false
+    },
+    "message": "buffer overflow detected",
+    "fault_address": "",
+    "location": "",
+    "frames": [],
+    "target_frames": [],
+    "crash_signature": "29a059abcc6d821344e945918e6ca54242567fc58338946214d41dcf15b92dea",
+    "location_signature": "29a059abcc6d821344e945918e6ca54242567fc58338946214d41dcf15b92dea",
+    "signature_quality": "none",
+    "notes": [
+      "detected by a runtime check in the C library, which reports that a bound was violated but not where the write began"
+    ],
+    "evidence_refs": [
+      "exec/vuln_text_long/base.release/stderr.bin",
+      "exec/vuln_text_long/base.release/stdout.bin"
+    ],
+    "extra": {}
+  },
+  "replays": [
+    {
+      "index": 0,
+      "exit_code": 134,
+      "signal": 6,
+      "signal_name": "SIGABRT",
+      "timed_out": false,
+      "duration_s": 0.117503,
+      "error_type": "BUFFER_OVERFLOW",
+      "crash_signature": "29a059abcc6d821344e945918e6ca54242567fc58338946214d41dcf15b92dea",
+      "matched_expected": true,
+      "stdout_ref": "bundles/sec__vuln_text_long__release/replays/0/stdout.bin",
+      "stderr_ref": "bundles/sec__vuln_text_long__release/replays/0/stderr.bin"
+    },
+    {
+      "index": 1,
+      "exit_code": 134,
+      "signal": 6,
+      "signal_name": "SIGABRT",
+      "timed_out": false,
+      "duration_s": 0.116684,
+      "error_type": "BUFFER_OVERFLOW",
+      "crash_signature": "29a059abcc6d821344e945918e6ca54242567fc58338946214d41dcf15b92dea",
+      "matched_expected": true,
+      "stdout_ref": "bundles/sec__vuln_text_long__release/replays/1/stdout.bin",
+      "stderr_ref": "bundles/sec__vuln_text_long__release/replays/1/stderr.bin"
+    },
+    {
+      "index": 2,
+      "exit_code": 134,
+      "signal": 6,
+      "signal_name": "SIGABRT",
+      "timed_out": false,
+      "duration_s": 0.116381,
+      "error_type": "BUFFER_OVERFLOW",
+      "crash_signature": "29a059abcc6d821344e945918e6ca54242567fc58338946214d41dcf15b92dea",
+      "matched_expected": true,
+      "stdout_ref": "bundles/sec__vuln_text_long__release/replays/2/stdout.bin",
+      "stderr_ref": "bundles/sec__vuln_text_long__release/replays/2/stderr.bin"
+    }
+  ],
+  "stability": "stable",
+  "environment": {
+    "hostname": "alireza",
+    "platform": "Linux-7.0.0-34-generic-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "kernel": "7.0.0-34-generic",
+    "python": "3.12.3",
+    "cpu_count": 12,
+    "container": {
+      "detected": "false"
+    },
+    "image_digest": "local",
+    "tools": {
+      "git": "git version 2.43.0",
+      "bwrap": "bubblewrap 0.9.0",
+      "readelf": "GNU readelf (GNU Binutils for Ubuntu) 2.42",
+      "cmake": "cmake version 3.28.3"
+    }
+  }
+}

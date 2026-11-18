@@ -1,0 +1,326 @@
+{
+  "bundle_version": "1.0",
+  "finding_id": "sec/boundary_text32/sanitized",
+  "target": {
+    "name": "recparse",
+    "repo_path": "/tmp/claude-1000/-home-alireza-Desktop-security-project/bdf060c1-e9f7-47a3-8a11-95ad23ab9263/scratchpad/pv/targets/recparse/repo",
+    "source_subdir": "."
+  },
+  "test_case": {
+    "id": "boundary_text32",
+    "category": "boundary",
+    "note": "One past the limit. The release build does not fault here; only the sanitized build does."
+  },
+  "version": "base",
+  "commit": "9d8c9fe9666bfb20611f3ea388bdac598b3bdda0",
+  "revision": "base",
+  "build": {
+    "mode": "sanitized",
+    "compiler": "gcc",
+    "compiler_version": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+    "cflags": "-O1 -g -fno-omit-frame-pointer -fno-common -fsanitize=address,undefined",
+    "ldflags": "-fsanitize=address,undefined",
+    "commands": [
+      [
+        "cmake",
+        "-S",
+        "/tmp/patch-validator-20261118T125435Z-pfun0_j7/src/base",
+        "-B",
+        "/tmp/patch-validator-20261118T125435Z-pfun0_j7/build/base.sanitized",
+        "-DCMAKE_BUILD_TYPE=None",
+        "-DCMAKE_C_COMPILER=gcc",
+        "-DCMAKE_C_FLAGS=-O1 -g -fno-omit-frame-pointer -fno-common -fsanitize=address,undefined",
+        "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined"
+      ],
+      [
+        "cmake",
+        "--build",
+        "/tmp/patch-validator-20261118T125435Z-pfun0_j7/build/base.sanitized",
+        "--parallel",
+        "12"
+      ]
+    ],
+    "binary_path": "/tmp/patch-validator-20261118T125435Z-pfun0_j7/build/base.sanitized/recparse",
+    "binary_sha256": "34df5c1b0ccc87c8bc9eed0a762422a7c7a9469016a739619fc7e5fba6615054"
+  },
+  "input": {
+    "method": "file",
+    "argv_template": [
+      "{input_file}"
+    ],
+    "filename": "input.bin",
+    "original_sha256": "81a3c2ba1545711d5b6088e264f77a1bdbf04546c87ac6c57f8aec735d499ab4",
+    "original_size": 40,
+    "minimized_sha256": null,
+    "minimized_size": null
+  },
+  "minimization": {
+    "finding_id": "sec/boundary_text32/sanitized",
+    "original_size": 40,
+    "minimized_size": 40,
+    "reduction_percent": 0.0,
+    "original_sha256": "81a3c2ba1545711d5b6088e264f77a1bdbf04546c87ac6c57f8aec735d499ab4",
+    "minimized_sha256": "81a3c2ba1545711d5b6088e264f77a1bdbf04546c87ac6c57f8aec735d499ab4",
+    "iterations": 24,
+    "duration_s": 0.439,
+    "stop_reason": "no further reduction possible",
+    "predicate": "the execution still reports crash signature 3c746c3d8d9ba68c… (STACK_BUFFER_OVERFLOW at src/record.c:22)",
+    "verified": false,
+    "original_ref": "",
+    "minimized_ref": "",
+    "trace_ref": "",
+    "notes": [
+      "no byte could be removed without changing the fault; the input is already minimal with respect to this predicate"
+    ]
+  },
+  "execution": {
+    "command": null,
+    "environment": {},
+    "timeout_s": 10,
+    "resource_limits": {
+      "memory_mb": 1024,
+      "cpu_s": 10,
+      "max_processes": 64,
+      "max_output_bytes": 1048576
+    }
+  },
+  "sandbox": {
+    "backend": "bubblewrap",
+    "network": false
+  },
+  "crash": {
+    "test_id": "boundary_text32",
+    "version": "base",
+    "build_mode": "sanitized",
+    "outcome": "security_event",
+    "error_type": "STACK_BUFFER_OVERFLOW",
+    "detection_mechanism": "address_sanitizer",
+    "confidence": "high",
+    "termination": {
+      "exit_code": 1,
+      "signal": null,
+      "signal_name": null,
+      "signal_inferred": false,
+      "timed_out": false
+    },
+    "message": "AddressSanitizer: stack-buffer-overflowon address 0x7bfb24300040 at pc 0x647dc5c78cc8 bp 0x7ffcf0bd8480 sp 0x7ffcf0bd8470",
+    "fault_address": "0x7bfb24300040",
+    "location": "src/record.c:22",
+    "frames": [
+      {
+        "index": 0,
+        "address": "647dc5c78cc7",
+        "function": "copy_payload",
+        "file": "/tmp/patch-validator-20261118T125435Z-pfun0_j7/src/base/src/record.c",
+        "line": 22,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": false
+      },
+      {
+        "index": 1,
+        "address": "647dc5c7927e",
+        "function": "handle_text",
+        "file": "/tmp/patch-validator-20261118T125435Z-pfun0_j7/src/base/src/record.c",
+        "line": 30,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": false
+      },
+      {
+        "index": 2,
+        "address": "647dc5c7927e",
+        "function": "parse_stream",
+        "file": "/tmp/patch-validator-20261118T125435Z-pfun0_j7/src/base/src/record.c",
+        "line": 102,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": false
+      },
+      {
+        "index": 3,
+        "address": "647dc5c78a75",
+        "function": "main",
+        "file": "/tmp/patch-validator-20261118T125435Z-pfun0_j7/src/base/src/main.c",
+        "line": 78,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": false
+      },
+      {
+        "index": 4,
+        "address": "7bfb2662a1c9",
+        "function": "__libc_start_call_main",
+        "file": "../sysdeps/nptl/libc_start_call_main.h",
+        "line": 58,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": true
+      },
+      {
+        "index": 5,
+        "address": "7bfb2662a28a",
+        "function": "__libc_start_main_impl",
+        "file": "../csu/libc-start.c",
+        "line": 360,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": true
+      },
+      {
+        "index": 6,
+        "address": "647dc5c78404",
+        "function": "_start (/tmp/patch-validator-20261118T125435Z-pfun0_j7/build/base.sanitized/recparse+0x3404) (BuildId: a59df0b1be06e1ca9fd9a0a4c292a8a5a6110089)",
+        "file": "",
+        "line": null,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": false
+      },
+      {
+        "index": 0,
+        "address": "647dc5c78cdd",
+        "function": "parse_stream",
+        "file": "/tmp/patch-validator-20261118T125435Z-pfun0_j7/src/base/src/record.c",
+        "line": 71,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": false
+      }
+    ],
+    "target_frames": [
+      {
+        "index": 0,
+        "address": "647dc5c78cc7",
+        "function": "copy_payload",
+        "file": "src/record.c",
+        "line": 22,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": false
+      },
+      {
+        "index": 1,
+        "address": "647dc5c7927e",
+        "function": "handle_text",
+        "file": "src/record.c",
+        "line": 30,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": false
+      },
+      {
+        "index": 2,
+        "address": "647dc5c7927e",
+        "function": "parse_stream",
+        "file": "src/record.c",
+        "line": 102,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": false
+      },
+      {
+        "index": 3,
+        "address": "647dc5c78a75",
+        "function": "main",
+        "file": "src/main.c",
+        "line": 78,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": false
+      },
+      {
+        "index": 0,
+        "address": "647dc5c78cdd",
+        "function": "parse_stream",
+        "file": "src/record.c",
+        "line": 71,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": false
+      }
+    ],
+    "crash_signature": "3c746c3d8d9ba68cecee7a9a7777e1c26023b91d635e320669481baac87949a1",
+    "location_signature": "9282e2706f43a1ff435553168e3a687c2b4b31513b3744d5fb70381b7b4d8906",
+    "signature_quality": "symbolized",
+    "notes": [],
+    "evidence_refs": [
+      "exec/boundary_text32/base.sanitized/stderr.bin",
+      "exec/boundary_text32/base.sanitized/stdout.bin"
+    ],
+    "extra": {}
+  },
+  "replays": [
+    {
+      "index": 0,
+      "exit_code": 1,
+      "signal": null,
+      "signal_name": null,
+      "timed_out": false,
+      "duration_s": 0.117594,
+      "error_type": "STACK_BUFFER_OVERFLOW",
+      "crash_signature": "3c746c3d8d9ba68cecee7a9a7777e1c26023b91d635e320669481baac87949a1",
+      "matched_expected": true,
+      "stdout_ref": "bundles/sec__boundary_text32__sanitized/replays/0/stdout.bin",
+      "stderr_ref": "bundles/sec__boundary_text32__sanitized/replays/0/stderr.bin"
+    },
+    {
+      "index": 1,
+      "exit_code": 1,
+      "signal": null,
+      "signal_name": null,
+      "timed_out": false,
+      "duration_s": 0.116265,
+      "error_type": "STACK_BUFFER_OVERFLOW",
+      "crash_signature": "3c746c3d8d9ba68cecee7a9a7777e1c26023b91d635e320669481baac87949a1",
+      "matched_expected": true,
+      "stdout_ref": "bundles/sec__boundary_text32__sanitized/replays/1/stdout.bin",
+      "stderr_ref": "bundles/sec__boundary_text32__sanitized/replays/1/stderr.bin"
+    },
+    {
+      "index": 2,
+      "exit_code": 1,
+      "signal": null,
+      "signal_name": null,
+      "timed_out": false,
+      "duration_s": 0.116383,
+      "error_type": "STACK_BUFFER_OVERFLOW",
+      "crash_signature": "3c746c3d8d9ba68cecee7a9a7777e1c26023b91d635e320669481baac87949a1",
+      "matched_expected": true,
+      "stdout_ref": "bundles/sec__boundary_text32__sanitized/replays/2/stdout.bin",
+      "stderr_ref": "bundles/sec__boundary_text32__sanitized/replays/2/stderr.bin"
+    }
+  ],
+  "stability": "stable",
+  "environment": {
+    "hostname": "alireza",
+    "platform": "Linux-7.0.0-34-generic-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "kernel": "7.0.0-34-generic",
+    "python": "3.12.3",
+    "cpu_count": 12,
+    "container": {
+      "detected": "false"
+    },
+    "image_digest": "local",
+    "tools": {
+      "git": "git version 2.43.0",
+      "bwrap": "bubblewrap 0.9.0",
+      "readelf": "GNU readelf (GNU Binutils for Ubuntu) 2.42",
+      "cmake": "cmake version 3.28.3"
+    }
+  }
+}

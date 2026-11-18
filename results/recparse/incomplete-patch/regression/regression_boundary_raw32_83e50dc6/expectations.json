@@ -1,0 +1,28 @@
+{
+  "base": {
+    "must_fault": true,
+    "error_type": "STACK_BUFFER_OVERFLOW",
+    "location_signature": "de82fce02d5bf916348257a4cf6cc1c6149501ff88164623607bb1f1061669f5",
+    "location": "src/record.c:22",
+    "detection_mechanism": "address_sanitizer"
+  },
+  "patched": {
+    "must_fault": false,
+    "oracle": {
+      "source": "specification",
+      "input_validity": "boundary",
+      "instructor_approved": "pending",
+      "exit_code": 2,
+      "stdout": {
+        "match": "exact",
+        "value": "records: 1\n"
+      },
+      "stderr": {
+        "match": "contains",
+        "value": "too long"
+      },
+      "semantics": "Length 32 must be rejected for RAW as well as TEXT."
+    }
+  },
+  "build_mode": "sanitized"
+}

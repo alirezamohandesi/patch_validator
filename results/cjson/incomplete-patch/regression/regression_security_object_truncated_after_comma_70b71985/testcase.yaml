@@ -1,0 +1,17 @@
+tests:
+- id: regression_security_object_truncated_after_comma_70b71985
+  category: security
+  note: generated from finding sec/security_object_truncated_after_comma/sanitized;
+    minimized reproducer for HEAP_BUFFER_OVERFLOW at cJSON.c:787
+  input:
+    path: regression/regression_security_object_truncated_after_comma_70b71985/input.bin
+  oracle:
+    source: upstream_docs
+    input_validity: invalid
+    instructor_approved: pending
+    exit_code: 1
+    stderr:
+      match: contains
+      value: invalid json
+    semantics: An object that ends immediately after a member separator is incomplete
+      and must be rejected without reading past the supplied length.

@@ -1,0 +1,52 @@
+=================================================================
+==2==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x75ef28500080 at pc 0x5c0dfa9abcc8 bp 0x7ffe2c206920 sp 0x7ffe2c206910
+WRITE of size 1 at 0x75ef28500080 thread T0
+    #0 0x5c0dfa9abcc7 in copy_payload /tmp/patch-validator-20261118T125445Z-jo2rmqsw/src/base/src/record.c:22
+    #1 0x5c0dfa9ac609 in handle_raw /tmp/patch-validator-20261118T125445Z-jo2rmqsw/src/base/src/record.c:57
+    #2 0x5c0dfa9ac609 in parse_stream /tmp/patch-validator-20261118T125445Z-jo2rmqsw/src/base/src/record.c:108
+    #3 0x5c0dfa9aba75 in main /tmp/patch-validator-20261118T125445Z-jo2rmqsw/src/base/src/main.c:78
+    #4 0x75ef2a82a1c9 in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #5 0x75ef2a82a28a in __libc_start_main_impl ../csu/libc-start.c:360
+    #6 0x5c0dfa9ab404 in _start (/tmp/patch-validator-20261118T125445Z-jo2rmqsw/build/base.sanitized/recparse+0x3404) (BuildId: dde4580a27beda46ad9a92f434675aa1a0961076)
+
+Address 0x75ef28500080 is located in stack of thread T0 at offset 128 in frame
+    #0 0x5c0dfa9abcdd in parse_stream /tmp/patch-validator-20261118T125445Z-jo2rmqsw/src/base/src/record.c:71
+
+  This frame has 2 object(s):
+    [32, 64) 'buf' (line 28)
+    [96, 128) 'buf' (line 55) <== Memory access at offset 128 overflows this variable
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /tmp/patch-validator-20261118T125445Z-jo2rmqsw/src/base/src/record.c:22 in copy_payload
+Shadow bytes around the buggy address:
+  0x75ef284ffe00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x75ef284ffe80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x75ef284fff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x75ef284fff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x75ef28500000: f1 f1 f1 f1 00 00 00 00 f2 f2 f2 f2 00 00 00 00
+=>0x75ef28500080:[f3]f3 f3 f3 00 00 00 00 00 00 00 00 00 00 00 00
+  0x75ef28500100: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x75ef28500180: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x75ef28500200: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x75ef28500280: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x75ef28500300: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07 
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+==2==ABORTING

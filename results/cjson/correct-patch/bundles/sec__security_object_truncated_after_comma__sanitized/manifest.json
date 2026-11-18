@@ -1,0 +1,399 @@
+{
+  "bundle_version": "1.0",
+  "finding_id": "sec/security_object_truncated_after_comma/sanitized",
+  "target": {
+    "name": "cjson",
+    "repo_path": "/tmp/claude-1000/-home-alireza-Desktop-security-project/bdf060c1-e9f7-47a3-8a11-95ad23ab9263/scratchpad/pv/targets/cjson/repo",
+    "source_subdir": "."
+  },
+  "test_case": {
+    "id": "security_object_truncated_after_comma",
+    "category": "security",
+    "note": "The upstream reproducer for issue"
+  },
+  "version": "base",
+  "commit": "826cd6f842ae7e46ee38bbc097f9a34f2947388d",
+  "revision": "pv-base",
+  "build": {
+    "mode": "sanitized",
+    "compiler": "gcc",
+    "compiler_version": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+    "cflags": "-std=c99 -O1 -g -fno-omit-frame-pointer -fno-common -fsanitize=address,undefined",
+    "ldflags": "-fsanitize=address,undefined -lm",
+    "commands": [
+      [
+        "gcc",
+        "-std=c99",
+        "-O1",
+        "-g",
+        "-fno-omit-frame-pointer",
+        "-fno-common",
+        "-fsanitize=address,undefined",
+        "-I/tmp/patch-validator-20261118T125505Z-s_ytdzcy/src/base",
+        "-o",
+        "/tmp/patch-validator-20261118T125505Z-s_ytdzcy/build/base.sanitized/cjson_cli",
+        "/tmp/claude-1000/-home-alireza-Desktop-security-project/bdf060c1-e9f7-47a3-8a11-95ad23ab9263/scratchpad/pv/targets/cjson/harness/cjson_cli.c",
+        "/tmp/patch-validator-20261118T125505Z-s_ytdzcy/src/base/cJSON.c",
+        "-fsanitize=address,undefined",
+        "-lm"
+      ]
+    ],
+    "binary_path": "/tmp/patch-validator-20261118T125505Z-s_ytdzcy/build/base.sanitized/cjson_cli",
+    "binary_sha256": "fffeb3aac91c63e90041e1dd47c7e7a340c6909d16f9e76d9a245b0180489feb"
+  },
+  "input": {
+    "method": "file",
+    "argv_template": [
+      "{input_file}"
+    ],
+    "filename": "input.json",
+    "original_sha256": "880e9c79fdec2261160585730499727d63cd811a6d0792dcc04b46bce307d259",
+    "original_size": 7,
+    "minimized_sha256": "70b719852671c82ae4508bc308c00a864dbbb9f38aea282e8130d61981b6acc1",
+    "minimized_size": 6
+  },
+  "minimization": {
+    "finding_id": "sec/security_object_truncated_after_comma/sanitized",
+    "original_size": 7,
+    "minimized_size": 6,
+    "reduction_percent": 14.29,
+    "original_sha256": "880e9c79fdec2261160585730499727d63cd811a6d0792dcc04b46bce307d259",
+    "minimized_sha256": "70b719852671c82ae4508bc308c00a864dbbb9f38aea282e8130d61981b6acc1",
+    "iterations": 13,
+    "duration_s": 0.345,
+    "stop_reason": "no further reduction possible",
+    "predicate": "the execution still reports crash signature 90764e7c83cc36ec… (HEAP_BUFFER_OVERFLOW at cJSON.c:787)",
+    "verified": false,
+    "original_ref": "",
+    "minimized_ref": "",
+    "trace_ref": "",
+    "notes": []
+  },
+  "execution": {
+    "command": null,
+    "environment": {},
+    "timeout_s": 10,
+    "resource_limits": {
+      "memory_mb": 1024,
+      "cpu_s": 10,
+      "max_processes": 64,
+      "max_output_bytes": 1048576
+    }
+  },
+  "sandbox": {
+    "backend": "bubblewrap",
+    "network": false
+  },
+  "crash": {
+    "test_id": "security_object_truncated_after_comma",
+    "version": "base",
+    "build_mode": "sanitized",
+    "outcome": "security_event",
+    "error_type": "HEAP_BUFFER_OVERFLOW",
+    "detection_mechanism": "address_sanitizer",
+    "confidence": "high",
+    "termination": {
+      "exit_code": 1,
+      "signal": null,
+      "signal_name": null,
+      "signal_inferred": false,
+      "timed_out": false
+    },
+    "message": "AddressSanitizer: heap-buffer-overflowon address 0x502000000017 at pc 0x645808592559 bp 0x7ffecb0b05f0 sp 0x7ffecb0b05e0",
+    "fault_address": "0x502000000017",
+    "location": "cJSON.c:787",
+    "frames": [
+      {
+        "index": 0,
+        "address": "645808592558",
+        "function": "parse_string",
+        "file": "/tmp/patch-validator-20261118T125505Z-s_ytdzcy/src/base/cJSON.c",
+        "line": 787,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": false
+      },
+      {
+        "index": 1,
+        "address": "64580859adb2",
+        "function": "parse_object",
+        "file": "/tmp/patch-validator-20261118T125505Z-s_ytdzcy/src/base/cJSON.c",
+        "line": 1666,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": false
+      },
+      {
+        "index": 2,
+        "address": "64580859adb2",
+        "function": "parse_value",
+        "file": "/tmp/patch-validator-20261118T125505Z-s_ytdzcy/src/base/cJSON.c",
+        "line": 1366,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": false
+      },
+      {
+        "index": 3,
+        "address": "64580859c189",
+        "function": "cJSON_ParseWithLengthOpts",
+        "file": "/tmp/patch-validator-20261118T125505Z-s_ytdzcy/src/base/cJSON.c",
+        "line": 1126,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": false
+      },
+      {
+        "index": 4,
+        "address": "64580859c4f5",
+        "function": "cJSON_ParseWithLength",
+        "file": "/tmp/patch-validator-20261118T125505Z-s_ytdzcy/src/base/cJSON.c",
+        "line": 1188,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": false
+      },
+      {
+        "index": 5,
+        "address": "645808591ccc",
+        "function": "main",
+        "file": "/tmp/claude-1000/-home-alireza-Desktop-security-project/bdf060c1-e9f7-47a3-8a11-95ad23ab9263/scratchpad/pv/targets/cjson/harness/cjson_cli.c",
+        "line": 122,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": false
+      },
+      {
+        "index": 6,
+        "address": "7549f982a1c9",
+        "function": "__libc_start_call_main",
+        "file": "../sysdeps/nptl/libc_start_call_main.h",
+        "line": 58,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": true
+      },
+      {
+        "index": 7,
+        "address": "7549f982a28a",
+        "function": "__libc_start_main_impl",
+        "file": "../csu/libc-start.c",
+        "line": 360,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": true
+      },
+      {
+        "index": 8,
+        "address": "645808591534",
+        "function": "_start (/tmp/patch-validator-20261118T125505Z-s_ytdzcy/build/base.sanitized/cjson_cli+0x1c534) (BuildId: 9753b5459442d735f0b86885ffee639525ba1bd1)",
+        "file": "",
+        "line": null,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": false
+      },
+      {
+        "index": 0,
+        "address": "7549fa4fd9c7",
+        "function": "malloc",
+        "file": "../../../../src/libsanitizer/asan/asan_malloc_linux.cpp",
+        "line": 69,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": true
+      },
+      {
+        "index": 1,
+        "address": "645808591b0b",
+        "function": "read_all",
+        "file": "/tmp/claude-1000/-home-alireza-Desktop-security-project/bdf060c1-e9f7-47a3-8a11-95ad23ab9263/scratchpad/pv/targets/cjson/harness/cjson_cli.c",
+        "line": 77,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": false
+      },
+      {
+        "index": 2,
+        "address": "645808591b0b",
+        "function": "main",
+        "file": "/tmp/claude-1000/-home-alireza-Desktop-security-project/bdf060c1-e9f7-47a3-8a11-95ad23ab9263/scratchpad/pv/targets/cjson/harness/cjson_cli.c",
+        "line": 110,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": false
+      },
+      {
+        "index": 3,
+        "address": "7549f982a1c9",
+        "function": "__libc_start_call_main",
+        "file": "../sysdeps/nptl/libc_start_call_main.h",
+        "line": 58,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": true
+      },
+      {
+        "index": 4,
+        "address": "7549f982a28a",
+        "function": "__libc_start_main_impl",
+        "file": "../csu/libc-start.c",
+        "line": 360,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": true
+      },
+      {
+        "index": 5,
+        "address": "645808591534",
+        "function": "_start (/tmp/patch-validator-20261118T125505Z-s_ytdzcy/build/base.sanitized/cjson_cli+0x1c534) (BuildId: 9753b5459442d735f0b86885ffee639525ba1bd1)",
+        "file": "",
+        "line": null,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": false
+      }
+    ],
+    "target_frames": [
+      {
+        "index": 0,
+        "address": "645808592558",
+        "function": "parse_string",
+        "file": "cJSON.c",
+        "line": 787,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": false
+      },
+      {
+        "index": 1,
+        "address": "64580859adb2",
+        "function": "parse_object",
+        "file": "cJSON.c",
+        "line": 1666,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": false
+      },
+      {
+        "index": 2,
+        "address": "64580859adb2",
+        "function": "parse_value",
+        "file": "cJSON.c",
+        "line": 1366,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": false
+      },
+      {
+        "index": 3,
+        "address": "64580859c189",
+        "function": "cJSON_ParseWithLengthOpts",
+        "file": "cJSON.c",
+        "line": 1126,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": false
+      },
+      {
+        "index": 4,
+        "address": "64580859c4f5",
+        "function": "cJSON_ParseWithLength",
+        "file": "cJSON.c",
+        "line": 1188,
+        "column": null,
+        "module": "",
+        "offset": "",
+        "is_interceptor": false
+      }
+    ],
+    "crash_signature": "90764e7c83cc36ec98550b2b2553924e768cc54839079afad59d99f6b832fc8a",
+    "location_signature": "9d99d0e333e7e23fcc1456bbfc6a02b37116b44a92d961d9845f2cdf5e01a400",
+    "signature_quality": "symbolized",
+    "notes": [],
+    "evidence_refs": [
+      "exec/security_object_truncated_after_comma/base.sanitized/stderr.bin",
+      "exec/security_object_truncated_after_comma/base.sanitized/stdout.bin"
+    ],
+    "extra": {}
+  },
+  "replays": [
+    {
+      "index": 0,
+      "exit_code": 1,
+      "signal": null,
+      "signal_name": null,
+      "timed_out": false,
+      "duration_s": 0.117264,
+      "error_type": "HEAP_BUFFER_OVERFLOW",
+      "crash_signature": "90764e7c83cc36ec98550b2b2553924e768cc54839079afad59d99f6b832fc8a",
+      "matched_expected": true,
+      "stdout_ref": "bundles/sec__security_object_truncated_after_comma__sanitized/replays/0/stdout.bin",
+      "stderr_ref": "bundles/sec__security_object_truncated_after_comma__sanitized/replays/0/stderr.bin"
+    },
+    {
+      "index": 1,
+      "exit_code": 1,
+      "signal": null,
+      "signal_name": null,
+      "timed_out": false,
+      "duration_s": 0.166097,
+      "error_type": "HEAP_BUFFER_OVERFLOW",
+      "crash_signature": "90764e7c83cc36ec98550b2b2553924e768cc54839079afad59d99f6b832fc8a",
+      "matched_expected": true,
+      "stdout_ref": "bundles/sec__security_object_truncated_after_comma__sanitized/replays/1/stdout.bin",
+      "stderr_ref": "bundles/sec__security_object_truncated_after_comma__sanitized/replays/1/stderr.bin"
+    },
+    {
+      "index": 2,
+      "exit_code": 1,
+      "signal": null,
+      "signal_name": null,
+      "timed_out": false,
+      "duration_s": 0.11668,
+      "error_type": "HEAP_BUFFER_OVERFLOW",
+      "crash_signature": "90764e7c83cc36ec98550b2b2553924e768cc54839079afad59d99f6b832fc8a",
+      "matched_expected": true,
+      "stdout_ref": "bundles/sec__security_object_truncated_after_comma__sanitized/replays/2/stdout.bin",
+      "stderr_ref": "bundles/sec__security_object_truncated_after_comma__sanitized/replays/2/stderr.bin"
+    }
+  ],
+  "stability": "stable",
+  "environment": {
+    "hostname": "alireza",
+    "platform": "Linux-7.0.0-34-generic-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "kernel": "7.0.0-34-generic",
+    "python": "3.12.3",
+    "cpu_count": 12,
+    "container": {
+      "detected": "false"
+    },
+    "image_digest": "local",
+    "tools": {
+      "git": "git version 2.43.0",
+      "bwrap": "bubblewrap 0.9.0",
+      "readelf": "GNU readelf (GNU Binutils for Ubuntu) 2.42",
+      "cmake": "cmake version 3.28.3"
+    }
+  }
+}
